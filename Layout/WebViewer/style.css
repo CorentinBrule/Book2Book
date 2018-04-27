@@ -1,0 +1,84 @@
+menu{
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  left:0;
+  width:10%;
+  height: 100%;
+  background-color: black;
+  color: white;
+  font-family: monospace;
+  z-index: 1;
+  overflow-y: scroll;
+}
+
+html{
+  margin:0;
+  padding:0;
+}
+body{
+  margin: 0;
+  padding: 0;
+}
+
+#imagePage{
+
+  /*width: 100%;
+  height : auto;*/
+  position: absolute;
+  z-index: -1;
+}
+
+p{
+  margin: 0;
+  padding: 0;
+  position:absolute;
+  border-style: solid;
+}
+
+#layoutPage{
+  position: absolute;
+  color: transparent;
+}
+
+
+.TextRegion{
+  margin: 0;
+  padding: 0;
+  position:absolute;
+  border: 1px solid blue;
+}
+
+
+.TextLine{
+  font-size: initial;
+  margin: 0;
+  padding: 0;
+  position:absolute;
+  border: 1px none green;
+}
+
+.Word{
+  font-size: initial;
+  margin: 0;
+  padding: 0;
+  position:absolute;
+  border: 1px none orange;
+}
+
+.Glyph{
+  font-size: initial;
+  margin: 0;
+  padding: 0;
+  position:absolute;
+  border: 1px none red;
+}
+
+.caption{
+  display: none;
+  position: fixed;
+  top:0;
+  right:0;
+  color: black;
+  font-size: initial;
+}

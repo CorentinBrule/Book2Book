@@ -1,0 +1,54 @@
+h1,h2,h3{
+  font-family: Share-Tech;
+  font-style: normal;
+  font-weight: normal;
+}
+
+h1 {
+  /*text-align: center;*/
+  font-size: 4rem;
+}
+
+h2 {
+  font-size:3rem;
+}
+
+h3{
+  font-size: 2rem;
+}
+
+body{
+  margin-left: 20%;
+  margin-right: 20%;
+  font-family: "source sans pro"
+}
+
+pre{
+  padding: 1em;
+  background-color: blue;
+
+  /*overflow-x: scroll;*/
+}
+
+.center{
+  text-align: center;
+}
+
+em{
+  font-family: "share-tech"
+}
+
+code{
+  font-family: "Share-TechMono";
+  background-color: blue;
+  color: white;
+}
+
+a{
+  color:blue;
+}
+
+.figure img{
+  display: flex;
+  margin: auto;
+}

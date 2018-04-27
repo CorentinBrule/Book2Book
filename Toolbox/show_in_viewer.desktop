@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Show in HOCR viewer
+Comment=Description
+Categories=Applications
+Exec=python3.5 /home/macrico/documents/des-lacunes-de-la-typographie/ToolboxV2/show_in_viewer.py %F
+StartupNotify=true
+Terminal=false

@@ -1,0 +1,17 @@
+*.pyc
+Toolbox/*.pyc
+
+# Book folder
+Book/*
+!Book/README.md
+
+# Layout folder
+Layout/*.html
+Layout/hocr-charboxes/*
+
+# Glyph folder
+Glyphes/*/*
+
+# Font folder
+Font/*
+!Font/README.md

@@ -1,0 +1,46 @@
+---
+rootFolderProject:  .
+toolboxFolder:  Toolbox/
+
+pagesImagesFolder:  Pages/
+pagesResolution: 300
+
+hocrFolder:   Layout/hocr-charboxes/
+ocrLanguage:  fra
+hocrMarginPixel:  2
+
+capHeight: 0
+
+extractedGlyphImageFolder: Glyphes/auto-extracted/
+
+sortedGlyphImageFolder: Glyphes/auto-extracted/
+sortInSameFolder: 0
+
+averageFolder: Glyphes/average/
+
+levelsFolder: Glyphes/levels/
+levelValues:
+  - 15
+  - 30
+  - 60
+deltaValue: 50
+
+resizedFolder: Glyphes/resized/
+
+pnmFolder: Glyphes/clean/
+
+vectorsFolder: Glyphes/vectors/
+nbSimple: 0
+ifHTML: 0
+validLevelValue: 30
+
+svgFontSourceFile: ToolboxV2/font.svg
+svgFontFile: Font/font.svg
+
+fontSourceFile: Font/font.sfd
+individualGlyphFolder : Font/individualGlyphs/
+
+metricsFile: Font/metrics.json
+
+cadratinSize: 1000
+...

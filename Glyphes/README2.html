@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="apropos.css" type="text/css">
+</head>
+
+<body>
+<h1 id="dessin-de-la-typographie-à-partir-des-scans-des-glyphes">Dessin de la typographie à partir des scans des glyphes :</h1>
+<h2 id="extraction">extraction</h2>
+<ul>
+<li><h3 id="depuis-des-fichiers-page"> depuis des fichiers PAGE</h3>
+<p>Les images des glyphes sont extraites avec le script <em>/Toolbox/extract-images-from-PAGE.py</em> :</p>
+<pre><code>python Toolbox/extract-images-from-PAGE.py {folderInputXMLs} {folderInputImgs} {folderOutputPath}
+# exemple :
+python Toolbox/extract-images-from-PAGE.py Layout/T2P-layout-glyphs Pages Glyphes/extractionAutomatique</code></pre></li>
+<li><h3 id="depuis-des-fichiers-hocr">depuis des fichiers HOCR</h3>
+<p>Les images des glyphes sont extraites avec le script <em>/Toolbox/extract-images-from-HOCR.py</em> :</p>
+<pre><code>python3.5 Toolbox/extract-images-from-HOCR.py {folderInputHOCRs} {folderInputImgs} {folderOutputGlyphes}
+# exemple :
+python3.5 Toolbox/extract-images-from-HOCR.py Layout/hocr-charboxes/ Pages/ Glyphes/extractionAutomatique/</code></pre></li>
+</ul>
+<p>elles sont enregistrées sous la forme : (<code>{char}{page}-{numéro}.png</code>) pour l'extraction 2 <code>{char}{page}-{id}.png</code> pour extraction 3 <img src="extractionAutomatique2-sorted2/a/a336-21804.png" alt="a336-21804.png" /></p>
+<h2 id="tri">tri</h2>
+<p>puis triées par le script <em>/Toolbox/sort-image-of-char.py</em></p>
+<pre><code>python3.5 Toolbox/sort-image-of-char.py {rootFolder} #fichier où sont les images pas encore triées
+# exemple :
+python3.5 Toolbox/sort-image-of-char.py Glyphes/extractionAutomatique/</code></pre>
+<p>le script va :</p>
+<ul>
+<li><p>trier les images à la racine, celles qui ne sont pas triées. Il indentifie le caractère de l'image par le premier élément de son titre. Il crée un dossier pour ce caractère si il n'existe pas encore. Il déplace l'image dans le dossier correspondant.</p></li>
+<li><p>retrier les images en parcourant les fichiers de tri pour repérer les images dont le nom ne correspond pas au fichier dans lequel elle est. Renommer ces images pour quelles correspondent au dossier dans lequel elles sont.</p></li>
+</ul>
+<p>Il faut donc lancer une première fois le script pour trier automatiquement les images. Puis vérifier à la main si une image ne correspond pas au dossier où elle est, la déplacer dans le fichier où elle devrait être. Relancer le script pour mettre a jour leur nom. Il faut aussi séparer les glyphes d'un autre style de caractère (italique,gras...). <em>TODO : vérifier que ces sous-dossiers de style de caractère ne pose pas de problème au script</em> <em>attention le script ne duplique pas le fichier original, il travaille directement dans le {rootFolder}</em></p>
+<p><img src="clean/a.1713.gif" alt="1713 a" /><img src="clean/b.259.gif" alt="259 b" /><img src="clean/c.669.gif" alt="669 c" /><img src="clean/d.970.gif" alt="259 b" /><img src="clean/e.3630.gif" alt="259 b" /><img src="clean/f.198.gif" alt="259 b" /><img src="clean/g.367.gif" alt="259 b" /><img src="clean/h.151.gif" alt="259 b" /><img src="clean/i.1801.gif" alt="259 b" /><img src="clean/j.46.gif" alt="259 b" /><img src="clean/k.2.gif" alt="259 b" /><img src="clean/l.1376.gif" alt="259 b" /><img src="clean/m.590.gif" alt="259 b" /><img src="clean/n.1689.gif" alt="259 b" /><img src="clean/o.1317.gif" alt="259 b" /><img src="clean/p.870.gif" alt="259 b" /><img src="clean/q.334.gif" alt="259 b" /><img src="clean/r.1801.gif" alt="259 b" /><img src="clean/s.2085.gif" alt="259 b" /><img src="clean/t.1611.gif" alt="259 b" /><img src="clean/u.1544.gif" alt="259 b" /><img src="clean/v.342.gif" alt="259 b" /><img src="clean/w.2.gif" alt="259 b" /><img src="clean/x.142.gif" alt="259 b" /><img src="clean/y.66.gif" alt="259 b" /><img src="clean/z.24.gif" alt="259 b" /></p>
+<p><em>mieux automatiser la création des gifs et générer un fichier markdown avec tous les noms des gif crées pour rapidement vérifier les tris</em></p>
+<h2 id="moyenne">moyenne</h2>
+<p>Créer un caractère qui soit représentatif de l'ensemble des glyphes de l'extrait pour gommer et intégrer les erreurs d'impression. Faire la &quot;moyenne&quot; de toutes les glyphes, c'est-à-dire superposer toutes les images du caractère en réduisant leurs opacités. On utilise pour cela la fonction <code>convert</code> de <a href="https://www.imagemagick.org/script/index.php">ImageMagick</a></p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">convert</span> <span class="dt">{images}</span> -average average.png</code></pre></div>
+<p><img src="average2/aaverage.png" alt="a-average" /> Automatisé dans le script : <em>Toolbox/average.py</em></p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">python</span> Toolbox/average.py <span class="dt">{folders2average}</span> <span class="dt">{outputFolder}</span>
+<span class="ex">python</span> Toolbox/average.py Glyphes/extractionAutomatique-sorted/a/ Glyphes/extractionAutomatique-sorted/b/ Glyphes/extractionAutomatique-sorted/c <span class="dt">{...}</span> Glyphes/average/</code></pre></div>
+<div class="figure">
+<img src="index2.jpg" alt="index2.jpg" />
+<p class="caption">index2.jpg</p>
+</div>
+<h2 id="contraste-de-limage-et-largeur-de-la-glyphe">contraste de l'image et largeur de la glyphe</h2>
+<p>A partir de cette image moyenne, avant de la vectoriser, il faut augmenter ses contrastes. Les contours flous de cette forme permettent déjà de choisir l'épaisseur des glyphes. Avec <a href="gimp" class="uri">gimp</a>, on augmente la résolution de l'image puis on utilise l'outil <strong>Niveaux</strong>.</p>
+<p>avant: <img src="gimpNiveauxAvant.png" alt="avant" /> après: <img src="gimpNiveauxApres.png" alt="après" /></p>
+<p><code>120 + 130 / 2 = 125</code> &lt;-- numéro du niveau</p>
+<p><img src="clean/a100-n50.png" alt="n50" /><img src="clean/a100-n90.png" alt="n90" /><img src="clean/a100-n125.png" alt="n125" /><img src="clean/a100-n180.png" alt="n180" /></p>
+<p><a href="http://bigelowandholmes.typepad.com/bigelow-holmes/2015/07/on-font-weight.html">Un point sur les épaisseurs de typographie</a></p>
+<p>ou alors avec <a href="https://www.imagemagick.org/Usage/color_mods/#level">ImageMagick</a> :</p>
+<pre><code>convert {imgSource} -level {mini},{max} {imgOutput}
+convert Glyphes/clean/a100.png -level 45%,55% Glyphes/clean/a100-50pc.png #45% + 55% / 2 = 50pc &lt;-- pourcentage du niveau
+# faire des testes avec des &quot;deltas&quot; différents (55%-45%=10% &lt;- delta du niveau) pour comparer le résulats de la vectorisation.</code></pre>
+<p>avec le script <em>Toolbox/level-by-letter.py</em></p>
+<pre><code>python3.5 Toolbox/level-by-letter.py {inputImage} {outputFolder}
+python3.5 Toolbox/level-by-letter.py Glyphes/average3/b.png Glyphes/levels3/</code></pre>
+<p>delta = 10% ---&gt; <img src="clean/a100-n50pc-d10-convert.png" /> <img src="clean/a100-n50pc-d3-convert.png" /> &lt;--- delta = 3%</p>
+<p><em>la préparation des bitmap peut-être réalisée aussi avec <a href="http://potrace.sourceforge.net/mkbitmap.html">mkbitmap</a></em></p>
+<div class="figure">
+<img src="GIF.gif" />
+
+</div>
+<h2 id="vectorisation">vectorisation</h2>
+<p>avec Inkscape en mode GUI ou ligne de commande, ou directement avec <a href="http://potrace.sourceforge.net/">Potrace</a> puis retouche et simplification du tracé avec inkscape.</p>
+<pre><code>inkscape -f clean/a100.png --select image10 --verb SelectionTrace #ouvre l&#39;interface graphique d&#39;inkscape directement avec l&#39;outil de vectorisation ouvert
+potrace clean/a100.bmp -s -o test.svg #vectorisation en ligne de commande (voir man potrace)</code></pre>
+<p><code>potrace clean/a100.bmp -s -o -a test2.svg</code><img src="clean/test2.svg" /> <code>potrace a100.bmp -s --opttolerance 1 -o test4.svg</code> <img src="clean/test4.svg" /> <code>potrace a100.bmp -s --opttolerance 2 -o test5.svg</code> <img src="clean/test5.svg" /></p>
+<h3 id="qualité-du-svg.">Qualité du SVG.</h3>
+<p>Avec potrace le path est enfant d'une balise &quot;g&quot; avec une grosse transformation. Les coordonnées des points du path sont arrondies après la virgules ! Avec inkscape aussi les tracés sont &quot;optimisés&quot; (mélange de coordonnées relatives et absolues). Pour les passer en absolues : &gt; 'Edit&gt; preferences &gt; SVG Output &gt; Path Data' to always use absolute coordinates (i.e. do not allow relative coordinates). This will only affect newly created paths, or existing objects for which a rewrite of the path data is triggered. For existing paths, use 'Edit &gt; Select All in All Layers', and nudge the selection with the arrow keys (e.g. one step up and one back down again). This will trigger a rewrite of the path data in 'd' which will follow the changed preferences for optimized path data. resave.</p>
+<h3 id="visionner-les-tracés">Visionner les tracés :</h3>
+<p>Visionneuse de tracés, points et poignées : <em><a href="vectors/index.html">/Glyphes/vectors/index.html</a></em></p>
+<p><em>(to do: corriger le décalage entre les handles d'un point à un autre/OK-25-01-17/ mais il reste des problèmes pour les derniers points, après un segClosePath)</em></p>
+<h3 id="simplification-du-tracé">Simplification du tracé :</h3>
+<p>simplification réalisée avec inkscape : <img src="clean/a30-vectInk-simp0-viz.svg" alt="0 simplification" /><img src="clean/a30-vectInk-simp1-viz.svg" alt="1 simplification" /><img src="clean/a30-vectInk-simp2-viz.svg" alt="2 simplifications" /><img src="clean/a30-vectInk-simp8-viz.svg" alt="8 simplifications" /><img src="clean/a30-vectInk-simp17-viz.svg" alt="17 simplifications" /><img src="clean/a30-vectInk-simp24-viz.svg" alt="24 simplifications" /></p>
+<p><em>(to do : faire un script qui simplifi et sauvegarde le tracé une 30ene de fois et qui génère le html pour la visioneuse.)</em></p>
+<h3 id="script-vectorize.py">Script <em>vectorize.py</em></h3>
+<pre><code>python3.5 Toolbox/vectorize.py {imagesInput} {outputFolder}
+python3.5 Toolbox/vectorize.py Glyphes/levels/a30pc10d.png Glyphes/vectors/</code></pre>
+<ul>
+<li>convertit en ppm et les enregistre dans Glyphes/clean</li>
+<li>vectorise dans {outputFolder}</li>
+<li>simplifie sous la forme <code>{char}{level}-simpl{nb simplification}.svg</code></li>
+<li>crée un fichier html pour afficher les tracés et leurs poignées</li>
+</ul>
+<h2 id="le-o-et-le-n">le o et le n</h2>
+<p><img src="extractionAutomatique2-sorted2/o/o337-22819.png" alt="o extraction auto" /><img src="average2/oaverage.png" alt="o average" /><img src="clean/olevel.png" alt="o level" /></p>
+<p><img src="extractionAutomatique2-sorted2/n/n336-22086.png" alt="n extraction auto" /><img src="average2/naverage.png" alt="n average" /><img src="clean/nlevel.png" alt="n level" /></p>
+<p>trust your eyes : 30% de niveaux</p>

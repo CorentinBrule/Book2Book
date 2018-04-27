@@ -1,0 +1,47 @@
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>PAGE webViewer</title>
+
+  <link rel="stylesheet" type="text/css" href="hocr.css" media="screen" charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="dragresize.css" media="screen" charset="utf-8">
+  <script src="dragresize.js"></script>
+</head>
+  <menu id="menu">
+    <select id="selectPage" name="Page n°"></select>
+    <br>
+    <input id="checkboxImage" class="cbimages" type="checkbox" value="ocr_page" checked="true" onchange="checkImage(this)">Image<br>
+    <h2>Borders</h2>
+    <input id="cbBordersP" class="cbborders" type="checkbox" value="ocr_page" checked="true" onchange="checkBorders(this)">Page<br>
+    <input id="cbBordersTAs" class="cbborders" type="checkbox" value="ocr_carea" checked="true" onchange="checkBorders(this)">Text Areas<br>
+    <input id="cbBordersTPs" class="cbborders" type="checkbox" value="ocr_par" checked="true" onchange="checkBorders(this)">Text Paragraphes<br>
+    <input id="cbBordersTLs" class="cbborders" type="checkbox" value="ocr_line" onchange="checkBorders(this)">Text Lines<br>
+    <input id="cbBordersWs" class="cbborders" type="checkbox" value="ocrx_word" checked="true" onchange="checkBorders(this)">Words<br>
+    <input id="cbBordersGs" class="cbborders" type="checkbox" value="ocrx_cinfo" onchange="checkBorders(this)">Glyphs<br>
+    <h2>Text</h2>
+    <input id="cbTextP" type="radio" name="text" value="ocr_page"  onclick="checkText(this)">Page<br>
+    <input id="cbTextTAs" type="radio" name="text" value="ocr_carea" onclick="checkText(this)">Text Areas<br>
+    <input id="cbTextTPs" type="radio" name="text" value="ocr_par"  onclick="checkText(this)">Text Paragraphes<br>
+    <input id="cbTextTLs" type="radio" name="text" value="ocr_line" onclick="checkText(this)">Text Lines<br>
+    <input id="cbTextWs" type="radio" name="text" value="ocrx_word" onclick="checkText(this)">Words<br>
+    <input id="cbTextGs" type="radio" name="text" value="ocrx_cinfo" checked="true" onclick="checkText(this)">Glyphs<br>
+    <h2>Focus</h2>
+    <!--<input id="cb0FocusTRs" class="cbFocus" type="radio" name="focus" value="TextRegion" checked="true" onclick="focus(this)">Text Regions<br>
+    <input id="cb1FocusTLs" class="cbFocus" type="radio" name="focus" value="TextLine" onclick="focus(this)">Text Lines<br>
+    <input id="cb2FocusWs" class="cbFocus" type="radio" name="focus" value="Word" onclick="focus(this)">Words<br>
+    <input id="cb3FocusGs" class="cbFocus" type="radio" name="focus" value="Glyph" onclick="focus(this)">Glyphs<br>-->
+    <h2>Zoom</h2>
+    <input type='range' class='slide zoom' min='0' max='500' step='2' value="100"/>
+    <h2>Font</h2>
+    <input type='range' class='slide fontSize' min='0' max='100' step='1' value="10"/>
+  </menu>
+  <body>
+
+    <img id="imagePage" class="imagePage"/>
+
+    <div class="hocr-viewer"></div>
+
+  </body>
+  <script src="hocr.js"></script>
+  <script src="editing.js"></script>
+</html>
