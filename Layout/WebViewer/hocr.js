@@ -2,6 +2,8 @@ var list_ocr_tag = ["ocr_page","ocr_carea","ocr_par","ocr_line","ocrx_word","ocr
 var debPage = 336;
 var finPage = 356;
 
+var currentHOCR;
+
 var page = 0;
 var hash;
 var targetHash="";
@@ -14,9 +16,7 @@ var selector = document.querySelector("#selectPage");
 var cbborders = document.getElementsByClassName("cbborders")
 var cbimages = document.getElementsByClassName("cbimages")
 
-window.onhashchange = function() {
-    updateWithHash();
-}
+// keyboard events
 
 document.addEventListener('keypress', (event) => {
   const nomTouche = event.key;
@@ -40,6 +40,12 @@ document.addEventListener('keypress', (event) => {
         }
     }
 });
+
+// url hash for the "open with..." feature while sorting glyphs
+
+window.onhashchange = function() {
+    updateWithHash();
+}
 
 function updateWithHash(){
     hash = location.hash;
@@ -74,6 +80,8 @@ function updateWithHash(){
     }
 }
 
+// create page selection in interface
+
 for (var ipage = debPage; ipage < finPage + 1; ipage++) {
     var option = document.createElement('option');
     option.value = ipage;
@@ -86,6 +94,8 @@ for (var ipage = debPage; ipage < finPage + 1; ipage++) {
     }*/
 }
 updateWithHash();
+
+// interface interactions
 
 document.querySelector("#selectPage").addEventListener('change', function() {
     loadFile(this.value);
@@ -228,25 +238,7 @@ fontSlider.addEventListener('input', function(ev) {
   textDiv.style.fontSize = scaleFactor+"em";
   // console.log();
 });
-/*
-function generateMenu(hocrDoc){
-  menu = document.getElementById("menu");
-  menu_html = ""
-  firstPage = hocrDoc.querySelector(".ocr_page");
-  if (getTitleAttribute(firstPage,"image")!= null ){
-    menu_html += '<input id="checkboxImage" type="checkbox" value="'+firstPage.id+'" checked="True" onchange="checkImage(this)">Image<br>'
-  }
-  var i = 0;
-  var len = list_ocr_tag.length;
-  for (i;i<len;i++){
-    tag = list_ocr_tag[i];
-    all_elements_by_tag = hocrDoc.getElementsByClassName(tag);
-    if (all_elements_by_tag.length > 0){
-      menu_html += '<input id="cbBorders'+tag+'" type="checkbox" value="'+tag+'" checked="True" onchange="checkBorders(this)">Text Regions<br>'
-    }
-  }
-}
-*/
+
 function getTitleAttribute(hocr_element,attribute){
   title = hocr_element.getAttribute("title");
   if (attribute ==  'bbox' || attribute == "x_bboxes"){
@@ -268,7 +260,7 @@ function getTitleAttribute(hocr_element,attribute){
   }
 }
 
-function placeOcrElements(element) {
+function placeHocrElement(element) {
   var coords = getTitleAttribute(element,"bbox");
   //console.log(element);
   element.style.left = coords[0] + "px";
@@ -279,13 +271,13 @@ function placeOcrElements(element) {
   document.querySelector('body').style.minHeight = page_coords[2] + 'px';
 }
 
+// load hocr file
+
 function functHOCR(xhttp) {
     var response = xhttp["response"];
     parser = new DOMParser();
     hocrDoc = parser.parseFromString(response, "text/html");
-
-    //generateMenu(hocrDoc)
-
+    currentHOCR = hocrDoc;
     //console.log(hocrDoc.body.innerHTML);
     firstPage = hocrDoc.querySelector(".ocr_page"); //ne fonctionne que pour une page par document hocr
 
@@ -305,7 +297,7 @@ function functHOCR(xhttp) {
       var ls = document.querySelectorAll("."+list_ocr_tag[i]);
       var len = ls.length;
       for (j ; j < len ; j++){
-        placeOcrElements(ls[j]);
+        placeHocrElement(ls[j]);
       }
     }
 

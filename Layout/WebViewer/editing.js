@@ -1,9 +1,11 @@
+// drag resize
 
 document.addEventListener('click',function(e){
   if(e.target.className.indexOf("editing") == -1 && e.target.className.indexOf("ocrx_cinfo") != -1){
     var oldEdit = document.querySelectorAll(".editing")
     if (oldEdit.length > 0){
       oldEdit[0].classList.remove("editing");
+      oldEdit[0].classList.add("edited")
     }
     var newEdit = e.target;
     newEdit.classList.add("editing");
@@ -13,6 +15,8 @@ document.addEventListener('click',function(e){
     var oldEdit = document.querySelectorAll(".editing")
     if (oldEdit.length > 0){
       oldEdit[0].classList.remove("editing");
+      oldEdit[0].classList.add("edited")
+      //applyTransform2Bbox(oldEdit[0]);
     }
   }
 });
@@ -90,5 +94,69 @@ function removeElement(){
     var editingElement = document.querySelectorAll(".editing")
     if (editingElement.length > 0){
       editingElement[0].parentNode.removeChild(editingElement[0])
+    }
+}
+
+// save edition
+
+function saveEdition(){
+    var newHTML = document.documentElement.cloneNode(true)
+    var newHOCR = newHTML.querySelector(".hocr-viewer")
+    //console.log(newHOCR)
+    var editedElements = newHOCR.querySelectorAll(".edited");
+
+    var i = 0;
+    for (i ; i<editedElements.length ; i++){
+        applyTransform2Bbox(editedElements[i]);
+    }
+    removeStyles(newHOCR);
+    //console.log(newHOCR.outerHTML)
+    newHTML = currentHOCR.cloneNode(true)
+
+    newHTML.body.innerHTML = newHOCR.outerHTML;
+
+    download(newHTML.documentElement.outerHTML,"p"+String(page)+".hocr","html")
+
+    //console.log(currentHOCR)
+
+    function applyTransform2Bbox(element){
+        l = element.style.left.split("px")[0];
+        t = element.style.top.split("px")[0];
+        w = String(parseInt(element.style.width.split("px")[0])+parseInt(l));
+        h = String(parseInt(element.style.height.split("px")[0])+parseInt(t));
+        oldTitle = element.getAttribute("title");
+        //var reReplace = new RegExp(/$1 / + l + / / + t + / / + w + / / + + h ,"g");
+        newTitle = oldTitle.replace(/(bbox|x_bboxes)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/,"$1 " + l + " " + t + " " + w + " "  + h)
+        element.setAttribute("title",newTitle)
+    }
+    function removeStyles(el) {
+
+        el.removeAttribute('style');
+
+        if(el.childNodes.length > 0) {
+            for(var child in el.childNodes) {
+                /* filter element nodes only */
+                if(el.childNodes[child].nodeType == 1)
+                    removeStyles(el.childNodes[child]);
+                }
+            }
+        }
+
+    function download(data, filename, type) {
+        var file = new Blob([data], {type: type});
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        else { // Others
+            var a = document.createElement("a"),
+                    url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
     }
 }
