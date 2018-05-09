@@ -2,6 +2,9 @@
 
 *.pyc
 Toolbox/*.pyc
+Toolbox/__pycache__/
+Toolbox/bookscanner/cache/
+Toolbox/bookscanner/__pycache__/
 
 # Book folder
 Book/*
@@ -17,3 +20,4 @@ Glyphes/*/*
 # Font folder
 Font/*
 !Font/README.md
+
