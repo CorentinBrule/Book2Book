@@ -1,6 +1,6 @@
 var list_ocr_tag = ["ocr_page","ocr_carea","ocr_par","ocr_line","ocrx_word","ocrx_cinfo"];
-var debPage = 336;
-var finPage = 356;
+var debPage = parseInt(config.debPage);
+var finPage = parseInt(config.finPage);
 
 var currentHOCR;
 
@@ -132,7 +132,7 @@ function loadFile(page) {
             functHOCR(xhttp);
         }
     };
-    xhttp.open("GET", "/Layout/hocr-charboxes/p" + page + ".hocr", true);
+    xhttp.open("GET", "/"+config.hocrFolder + page + ".hocr", true);
     xhttp.send();
 }
 

@@ -115,7 +115,7 @@ function saveEdition(){
 
     newHTML.body.innerHTML = newHOCR.outerHTML;
 
-    download(newHTML.documentElement.outerHTML,"p"+String(page)+".hocr","html")
+    download(newHTML.documentElement.outerHTML,"p"+     String(page)+".hocr","html")
 
     //console.log(currentHOCR)
 
