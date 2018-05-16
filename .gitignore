@@ -10,6 +10,9 @@ Toolbox/bookscanner/__pycache__/
 Book/*
 !Book/README.md
 
+# Page image folder
+Pages/*
+
 # Layout folder
 Layout/*.html
 Layout/hocr-charboxes/*

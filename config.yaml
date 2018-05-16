@@ -43,4 +43,7 @@ individualGlyphFolder : Font/individualGlyphs/
 metricsFile: Font/metrics.json
 
 cadratinSize: 1000
+
+webViewerFolder: Toolbox/WebViewer/
+webViewerPort: 8000
 ...
