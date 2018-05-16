@@ -76,35 +76,48 @@ if len(hocrSources) == len(imageSources):
         # xml browsing
         if firstPage is not None:
             nodeGlyphs = firstPage.find_all(attrs={"class": u"ocrx_cinfo"})
-            BarByPage = ProgressBar(len(nodeGlyphs), 30, 'Extraction page ' + pageNumber)
 
-            # unicodeChars = []
-            coordsCorpList = []
-            for n in nodeGlyphs:  # glyph by glyph
+            if len(nodeGlyphs) > 0:
 
-                area = extracthocr.zoning(imgPage, n, margin)
-                confidenceValue = extracthocr.getTitleAttribute(n, "x_conf")
-                word = n.parent
-                try :
-                    if word.get("class").find("ocrx_word") == -1:
+                BarByPage = ProgressBar(len(nodeGlyphs), 30, 'Extraction page ' + pageNumber)
+
+                # unicodeChars = []
+                coordsCorpList = []
+                for n in nodeGlyphs:  # glyph by glyph
+
+                    area = extracthocr.zoning(imgPage, n, margin)
+                    confidenceValue = extracthocr.getTitleAttribute(n, "x_conf")
+                    word = n.parent
+                    try :
+                        if word.get("class").find("ocrx_word") == -1:
+                            word = word.parent
+                    except AttributeError:
                         word = word.parent
-                except AttributeError:
-                    word = word.parent
 
-                try :
-                    word_id = word.get('id')
-                except:
-                    print(n)
-                    print(word)
+                    try :
+                        word_id = word.get('id')
+                    except:
+                        print(n)
+                        print(word)
 
-                char = n.get_text()
+                    glyphName = n.get_text()
 
-                outputName = char + "-" + str(int(confidenceValue)) + "-" + str(pageNumber) + "-" + str(word_id) + "-" + str(globalGlyphCount) + ".png"
+                    outputName = glyphName + "-" + str(int(confidenceValue)) + "-" + str(pageNumber) + "-" + str(word_id) + "-" + str(globalGlyphCount) + ".png"
+                    if glyphName == ".":  # to fix "." name
+                        subprocess.call(["mkdir", "-p", outputFolder + ".point"])
+                        #subprocess.call(["mv", outputFolder + imgUnsorted, outputFolder + ".point/"])
+                        area.save(outputFolder + ".point/" + outputName)
+                    else:
+                        subprocess.call(["mkdir", "-p", outputFolder + glyphName])
+                        #subprocess.call(["mv", outputFolder + imgUnsorted, outputFolder + glyphName])
+                        area.save(outputFolder + glyphName + "/" + outputName)
+                        subprocess.call(["mkdir", "-p", outputFolder + glyphName +  "/Italic"])
+                        subprocess.call(["mkdir", "-p", outputFolder + glyphName +  "/Bold"])
 
-                area.save(outputFolder + outputName)
-                globalGlyphCount += 1
-                BarByPage.update()
-                #coordsCorpList.append(coordCrop)
+                    #area.save(outputFolder + outputName)
+                    globalGlyphCount += 1
+                    BarByPage.update()
+                    #coordsCorpList.append(coordCrop)
         else:
             print("impossible to extract images from {}".format(pageNumber))
 
