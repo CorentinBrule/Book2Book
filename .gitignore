@@ -18,7 +18,7 @@ Layout/*.html
 Layout/hocr-charboxes/*
 
 # Glyph folder
-Glyphes/*/*
+Glyphs/*/*
 
 # Font folder
 Font/*
