@@ -12,15 +12,24 @@ Book/*
 
 # Page image folder
 Pages/*
+!Pages/README.md
 
 # Layout folder
 Layout/*.html
 Layout/hocr-charboxes/*
 
 # Glyph folder
-Glyphs/*/*
+Glyphs/auto-extracted/*
+Glyphs/average/*
+Glyphs/clean/*
+Glyphs/levels/*
+Glyphs/specialChar/*
+Glyphs/vectors/*
 
 # Font folder
 Font/*
 !Font/README.md
 
+Old/
+
+*.autosave

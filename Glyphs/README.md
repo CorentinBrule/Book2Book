@@ -1,73 +1,98 @@
-# Dessin de la typographie à partir des scans des glyphes :
+# Dessin de caractère à partir des scans des glyphes :
 
-## extraction
+## Extraction
 
-* ### depuis des fichiers PAGE
-Les images des glyphes sont extraites avec le script */Toolbox/extract-images-from-PAGE.py* :
-```
-python Toolbox/extract-images-from-PAGE.py {folderInputXMLs} {folderInputImgs} {folderOutputPath}
-# exemple :
-python Toolbox/extract-images-from-PAGE.py Layout/T2P-layout-glyphs Pages Glyphes/extractionAutomatique
-```
+### depuis des fichiers HOCR
+Les images des glyphes sont extraits avec le script `/Toolbox/extract-images-from-HOCR.py` :
+<pre>
+<code>python3.5 Toolbox/extract-images-from-HOCR.py [-c CONFIGFILE] [-H HOCR [HOCR ...]][-i IMAGE [IMAGE ...]] [-m MARGIN] [-o OUTPUT]</code>
+# exemple :
+<code>python3.5 Toolbox/extract-images-from-HOCR.py -H Layout/hocr-charboxes/ -i Pages/ -o Glyphes/auto-extracted/ -m 2</code></pre>
 
-* ### depuis des fichiers HOCR
-Les images des glyphes sont extraites avec le script */Toolbox/extract-images-from-HOCR.py* :
-```
-python3.5 Toolbox/extract-images-from-HOCR.py {folderInputHOCRs} {folderInputImgs} {folderOutputGlyphes}
-# exemple :
-python3.5 Toolbox/extract-images-from-HOCR.py Layout/hocr-charboxes/ Pages/ Glyphes/extractionAutomatique/
-```
+elles sont enregistrées sous la forme :
+`glyph-confiance-page-id_mot-numéro.png`
 
+* `glyph` : caractère ou nom du glyphe
+* `confiance` : score de confiance du logiciel OCR en %
+* `page` : numéro de la page
+* `id_mot` : attribut "id" du mot (parent direct) du glyphe dans le fichier HOCR (`#word_1_numéroDuMot`)
+* `numéro` : numéro du glyph dans la page
 
-elles sont enregistrées sous la forme :
-(`{char}{page}-{numéro}.png`) pour l'extraction 2
-`{char}{page}-{id}.png` pour extraction 3
-![a336-21804.png](extractionAutomatique2-sorted2/a/a336-21804.png)
+exemple : `a-85-339-word_1_230-4591.png`
+![a336-21804.png](auto-extracted/a/a-85-339-word_1_230-4591.png)
 
-## tri
+Les glyphes extraits sont directement placés dans des dossiers portant leur nom, pour gagner du temps sur l’étape de tri.
 
-puis triées par le script */Toolbox/sort-image-of-char.py*
-```
-python3.5 Toolbox/sort-image-of-char.py {rootFolder} #fichier où sont les images pas encore triées
-# exemple :
-python3.5 Toolbox/sort-image-of-char.py Glyphes/extractionAutomatique/
-```
-le script va :
+## Tri
 
-* trier les images à la racine, celles qui ne sont pas triées. Il indentifie le caractère de l'image par le premier élément de son titre. Il crée un dossier pour ce caractère si il n'existe pas encore. Il déplace l'image dans le dossier correspondant.
+Le script `/Toolbox/sort-image-of-char.py`
+<pre>
+<code>python3.5 Toolbox/sort-image-of-char.py [-c CONFIGFILE] [-r ROOTFOLDER] [-o OUTPUT] [-n] [--hocrI HOCRI] [--hocrO HOCRO]</code>
+# exemple :
+<code>python3.5 Toolbox/sort-image-of-char.py -r Glyphes/auto-extracted/ --hocrI Layout/hocr-originaux --hocrO Layout/hocr-modifié</code>
+</pre>
+le script va :
 
-* retrier les images en parcourant les fichiers de tri pour repérer les images dont le nom ne correspond pas au fichier dans lequel elle est. Renommer ces images pour quelles correspondent au dossier dans lequel elles sont.
+* trier les images à la racine, celles qui ne sont pas triées. Il identifie le caractère de l’image par le premier élément de son titre. Il crée un dossier pour ce caractère si il n’existe pas encore. Il déplace l’image dans le dossier correspondant.
 
-Il faut donc lancer une première fois le script pour trier automatiquement les images. Puis vérifier à la main si une image ne correspond pas au dossier où elle est, la déplacer dans le fichier où elle devrait être. Relancer le script pour mettre a jour leur nom. Il faut aussi séparer les glyphes d'un autre style de caractère (italique,gras...).
-*TODO : vérifier que ces sous-dossiers de style de caractère ne pose pas de problème au script*
-*attention le script ne duplique pas le fichier original, il travaille directement dans le {rootFolder}*
+* retrier les images en parcourant les fichiers de tri pour repérer les images dont le nom ne correspond pas au fichier dans lequel elle est. Renommer ces images pour qu’elles correspondent au dossier dans lequel elles sont.
 
-![1713 a](clean/a.1713.gif)![259 b](clean/b.259.gif)![669 c](clean/c.669.gif)![259 b](clean/d.970.gif)![259 b](clean/e.3630.gif)![259 b](clean/f.198.gif)![259 b](clean/g.367.gif)![259 b](clean/h.151.gif)![259 b](clean/i.1801.gif)![259 b](clean/j.46.gif)![259 b](clean/k.2.gif)![259 b](clean/l.1376.gif)![259 b](clean/m.590.gif)![259 b](clean/n.1689.gif)![259 b](clean/o.1317.gif)![259 b](clean/p.870.gif)![259 b](clean/q.334.gif)![259 b](clean/r.1801.gif)![259 b](clean/s.2085.gif)![259 b](clean/t.1611.gif)![259 b](clean/u.1544.gif)![259 b](clean/v.342.gif)![259 b](clean/w.2.gif)![259 b](clean/x.142.gif)![259 b](clean/y.66.gif)![259 b](clean/z.24.gif)
+* modifier le nom du glyphe dans le fichier HOCR pour sauvegarder le tri
+
+Il faut vérifier à la main si une image ne correspond pas au dossier où elle est, la déplacer dans le fichier où elle devrait être ou la supprimer. Lancer le script pour mettre à jour leur nom et le fichier HOCR. Il faut aussi séparer les glyphes d’un autre style de caractère (italique, gras...).
+
+![exempleTri](exempleTri.png)
+
+*préciser un fichier `hocrO` pour ne pas sauvegarder dans le fichier originel*
+
+*TODO : vérifier que ces sous-dossiers de style de caractère ne pose pas de problème au script*
+
+![1713 a](a.1713.gif)![259 b](b.259.gif)![669 c](c.669.gif)![259 b](d.970.gif)![259 b](e.3630.gif)![259 b](f.198.gif)![259 b](g.367.gif)![259 b](h.151.gif)![259 b](i.1801.gif)![259 b](j.46.gif)![259 b](k.2.gif)![259 b](l.1376.gif)![259 b](m.590.gif)![259 b](n.1689.gif)![259 b](o.1317.gif)![259 b](p.870.gif)![259 b](q.334.gif)![259 b](r.1801.gif)![259 b](s.2085.gif)![259 b](t.1611.gif)![259 b](u.1544.gif)![259 b](v.342.gif)![259 b](w.2.gif)![259 b](x.142.gif)![259 b](y.66.gif)![259 b](z.24.gif)
 
 *mieux automatiser la création des gifs et générer un fichier markdown avec tous les noms des gif crées pour rapidement vérifier les tris*
 
-## moyenne
+### Ouvrir dans la visionneuse
+Pour accélérer le tri, on peut vérifier sur l’image de la page, quelle caractère a été réellement scanné. Pour celà on peut mettre en place un raccourci pour ouvrir le `WebViewer` à la bonne page et centrer la vue sur la glyphe en question.
+Un script ouvre un navigateur web à l’adresse où la visionneuse est lancée avec comme arguments la page et l’id du mot parent du glyphe.
+```
+python3.5 Toolbox/show_in_viewer.py [page-id_mot]
+```
+Par exemple : `python3.5 Toolbox/show_in_viewer.py 343-word_1_203` ouvrira Firefox sur `localhost:8000/Toolbox/WebViewer/#343-word_1_203`, ainsi la bonne page sera chargée et le focus se fera sur le bon nœud du document HTML.
+Pour rendre accessible cette manipulation depuis un navigateur de fichier, sur GNU/linux, on rend le script exécutable `chmod +x Toolbox/show_in_viewer.py`, puis on configure son gestionnaire de fichier pour pouvoir accéder au script depuis le menu `ouvrir avec...` pour que tous les .png puisse être ouvert avec notre programme.
 
-Créer un caractère qui soit représentatif de l'ensemble des glyphes de l'extrait pour gommer et intégrer les erreurs d'impression. Faire la "moyenne" de toutes les glyphes, c'est-à-dire superposer toutes les images du caractère en réduisant leurs opacités. On utilise pour cela la fonction `convert` de  [ImageMagick](https://www.imagemagick.org/script/index.php)
-```sh
-convert {images} -average average.png
+*`click droit` sur l’image du glyphe, `ouvrir avec...` -> `showinviewer.py`*
+![](showinviewer.png)
+
+*/!\ cette fonction lancera toujours le WebViewer du projet qui a été configuré. Si plusieurs projets sont en cours ou que le dossier du projet à été déplacé, il faudra éditer le script pour bien configurer les chemins à la main.*
+
+## Moyenne
+
+Créer un caractère qui soit représentatif de l’ensemble des glyphes de l’extrait pour gommer et intégrer les erreurs d’impression. Faire la "moyenne" de tous les glyphes, c’est-à-dire superposer toutes les images du caractère en réduisant leurs opacités. On utilise pour cela la fonction `convert` de  [ImageMagick](https://www.imagemagick.org/script/index.php)
+```bash
+convert [images...] -average average.png
 ```
-![a-average](average2/aaverage.png)
-Automatisé dans le script : *Toolbox/average.py*
-```sh
-python Toolbox/average.py {folders2average} {outputFolder}
-python Toolbox/average.py Glyphes/extractionAutomatique-sorted/a/ Glyphes/extractionAutomatique-sorted/b/ Glyphes/extractionAutomatique-sorted/c {...} Glyphes/average/
-```
+![a-average](average/a.png)
+Automatisé dans le script : `Toolbox/average.py`
+
+<pre>
+<code>python3.5 average.py [-c CONFIGFILE] [-t TARGETFOLDER [TARGETFOLDER ...]] [-o OUTPUT]</code>
+# exemple :
+<code>python3.5 Toolbox/average.py -t Glyphes/extractionAutomatique-sorted/a/ Glyphes/extractionAutomatique-sorted/b/ Glyphes/extractionAutomatique-sorted/c -o Glyphes/average/</code>
+</pre>
+
 ![index2.jpg](index2.jpg)
 
-## contraste de l'image et largeur de la glyphe
+## Contraste de l’image et graisse du glyphe
 
 A partir de cette image moyenne, avant de la vectoriser, il faut augmenter ses contrastes.
-Les contours flous de cette forme permettent déjà de choisir l'épaisseur des glyphes. Avec [gimp](gimp), on augmente la résolution de l'image puis on utilise l'outil **Niveaux**.
+Les contours flous de cette forme permettent déjà de choisir la graisse  des glyphes. Pour illustrer l’opération, avec [gimp](gimp), on augmente la résolution de l’image puis on utilise l’outil **Niveaux**.
 
-avant:
+*avant:*
+
 ![avant](gimpNiveauxAvant.png)
-après:
+
+*après:*
+
 ![après](gimpNiveauxApres.png)
 
 `120 + 130 / 2 = 125` <-- numéro du niveau
@@ -76,62 +101,69 @@ après:
 
 [Un point sur les épaisseurs de typographie](http://bigelowandholmes.typepad.com/bigelow-holmes/2015/07/on-font-weight.html)
 
-ou alors avec [ImageMagick](https://www.imagemagick.org/Usage/color_mods/#level) :
-```
-convert {imgSource} -level {mini},{max} {imgOutput}
-convert Glyphes/clean/a100.png -level 45%,55% Glyphes/clean/a100-50pc.png #45% + 55% / 2 = 50pc <-- pourcentage du niveau
-# faire des testes avec des "deltas" différents (55%-45%=10% <- delta du niveau) pour comparer le résulats de la vectorisation.
-```
-avec le script *Toolbox/level-by-letter.py*
-```
-python3.5 Toolbox/level-by-letter.py {inputImage} {outputFolder}
-python3.5 Toolbox/level-by-letter.py Glyphes/average3/b.png Glyphes/levels3/
-```
-
-delta = 10% ---> ![](clean/a100-n50pc-d10-convert.png)  ![](clean/a100-n50pc-d3-convert.png) <--- delta = 3%
-
 *la préparation des bitmap peut-être réalisée aussi avec [mkbitmap](http://potrace.sourceforge.net/mkbitmap.html)*
 
+ou alors avec [ImageMagick](https://www.imagemagick.org/Usage/color_mods/#level) :
+<pre>
+<code>convert {imgSource} -level {mini},{max} {imgOutput}</code>
+<code>convert Glyphs/clean/a100.png -level 45%,55% Glyphs/clean/a100-50pc.png #45% + 55% / 2 = 50pc</code> <-- pourcentage du niveau.
+</pre>
+
+avec le script `Toolbox/level.py`
+<pre>
+<code>python3.5 Toolbox/level.py [-c CONFIGFILE] [-m METRICS] [-t TARGET [TARGET ...]] [-o OUTPUT] [-l LEVEL [LEVEL ...]] [-d DELTA]</code>
+# exemple :
+<code>python3.5 Toolbox/level.py -t Glyphs/average/ -o Glyphs/levels/ -l 15 30 60</code>
+</pre>
+
+* agrandit la taille des images
+* génère les différents contrastes
+
+<div class="flex-tier">![](levels/à15pc50d.png)![](levels/à30pc50d.png)![](levels/à60pc50d.png)</div>
 ![](GIF.gif)
 
-## vectorisation
-avec Inkscape en mode GUI ou ligne de commande, ou directement avec [Potrace](http://potrace.sourceforge.net/) puis retouche et simplification du tracé avec inkscape.
-```
-inkscape -f clean/a100.png --select image10 --verb SelectionTrace #ouvre l'interface graphique d'inkscape directement avec l'outil de vectorisation ouvert
-potrace clean/a100.bmp -s -o test.svg #vectorisation en ligne de commande (voir man potrace)
-```
+## Vectorisation
+avec Inkscape en mode GUI ou ligne de commande, ou directement avec [Potrace](http://potrace.sourceforge.net/) puis retouche et simplification du tracé avec Inkscape.
+<pre>
+<code>inkscape -f clean/a100.png --select image10 --verb SelectionTrace</code> #ouvre l’interface graphique d’inkscape directement avec l’outil de vectorisation ouvert
+<code>potrace clean/a100.bmp -s -o test.svg</code> #vectorisation en ligne de commande (voir man potrace)
+</pre>
 `potrace clean/a100.bmp -s -o -a test2.svg`![](clean/test2.svg) `potrace a100.bmp -s --opttolerance 1 -o test4.svg` ![](clean/test4.svg) `potrace a100.bmp -s --opttolerance 2 -o test5.svg` ![](clean/test5.svg)
 
 ### Qualité du SVG.
-Avec potrace le path est enfant d'une balise "g" avec une grosse transformation. Les coordonnées des points du path sont arrondies après la virgules ! Avec inkscape aussi les tracés sont "optimisés" (mélange de coordonnées relatives et absolues). Pour les passer en absolues :
+Avec Potrace la nœud "path" est enfant d’une balise "g" avec une grosse transformation. Les coordonnées des points du path sont arrondies après la virgules ! Avec inkscape aussi les tracés sont "optimisés" (mélange de coordonnées relatives et absolues). Pour les passer en absolues :
+
 > 'Edit> preferences > SVG Output > Path Data' to always use absolute coordinates (i.e. do not allow relative coordinates). This will only affect newly created paths, or existing objects for which a rewrite of the path data is triggered.
   For existing paths, use 'Edit > Select All in All Layers', and nudge the selection with the arrow keys (e.g. one step up and one back down again). This will trigger a rewrite of the path data in 'd' which will follow the changed preferences for optimized path data. resave.
 
-### Visionner les tracés :
-Visionneuse de tracés, points et poignées : *[/Glyphes/vectors/index.html](vectors/index.html)*
+### Visionner les tracés :
+Visionneuse de tracés, points et poignées : *[/Glyphes/vectors/index.html](vectors/index.html)*
 
-*(to do: corriger le décalage entre les handles d'un point à un autre/OK-25-01-17/ mais il reste des problèmes pour les derniers points, après un segClosePath)*
+*(to do: corriger le décalage entre les handles d’un point à un autre/OK-25-01-17/ mais il reste des problèmes pour les derniers points, après un segClosePath)*
 
-### Simplification du tracé :
-simplification réalisée avec inkscape :
-![0 simplification](clean/a30-vectInk-simp0-viz.svg)![1 simplification](clean/a30-vectInk-simp1-viz.svg)![2 simplifications](clean/a30-vectInk-simp2-viz.svg)![8 simplifications](clean/a30-vectInk-simp8-viz.svg)![17 simplifications](clean/a30-vectInk-simp17-viz.svg)![24 simplifications](clean/a30-vectInk-simp24-viz.svg)
+### Simplification :
+**pour le moment la simplification des tracés n’est pas implémentée dans un script**
 
-*(to do : faire un script qui simplifi et sauvegarde le tracé une 30ene de fois et qui génère le html pour la visioneuse.)*
+simplification réalisée avec inkscape :
 
-### Script *vectorize.py*
+![0 simplification](a30-vectInk-simp0-viz.svg)![1 simplification](a30-vectInk-simp1-viz.svg)![2 simplifications](a30-vectInk-simp2-viz.svg)![8 simplifications](a30-vectInk-simp8-viz.svg)![17 simplifications](a30-vectInk-simp17-viz.svg)![24 simplifications](a30-vectInk-simp24-viz.svg)
 
-```
-python3.5 Toolbox/vectorize.py {imagesInput} {outputFolder}
-python3.5 Toolbox/vectorize.py Glyphes/levels/a30pc10d.png Glyphes/vectors/
-```
+*(to do : faire un script qui simplifie et sauvegarde le tracé une 30ene de fois et qui génère le html pour la visionneuse.)*
+
+### Script `vectorize.py`
+
+<pre>
+<code>python3.5 Toolbox/vectorize.py [-c CONFIGFILE] [-t TARGET [TARGET ...]] [-o OUTPUT] [--pnm PNM] [-s SIMPLE] [--html] [-l LEVEL]</code>
+# exemple
+<code>python3.5 Toolbox/vectorize.py -t Glyphes/levels/a30pc10d.png -o Glyphes/vectors/</code>
+</pre>
+
 * convertit en ppm et les enregistre dans Glyphes/clean
 * vectorise dans {outputFolder}
 * simplifie sous la forme `{char}{level}-simpl{nb simplification}.svg`
 * crée un fichier html pour afficher les tracés et leurs poignées
 
 ## le o et le n
-![o extraction auto](extractionAutomatique2-sorted2/o/o337-22819.png)![o average](average2/oaverage.png)![o level](clean/olevel.png)
+![o average](average/o.png) ![o level](levels/o30pc50d.png) ![o vector](vectors/o30pc50d.svg)
 
-![n extraction auto](extractionAutomatique2-sorted2/n/n336-22086.png)![n average](average2/naverage.png)![n level](clean/nlevel.png)
-
-trust your eyes : 30% de niveaux
+![n average](average/n.png)![n level](levels/n30pc50d.png) ![n vector](vectors/n30pc50d.svg)
