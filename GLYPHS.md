@@ -1,5 +1,7 @@
-# Dessin de caractère à partir des scans des glyphes :
+<div style="page-break-after: always;"></div>
 
+# Dessin de caractère à partir des scans des glyphes :
+<div class="margin"></div>
 ## Extraction
 
 ### depuis des fichiers HOCR
@@ -21,7 +23,7 @@ elles sont enregistrées sous la forme :
 exemple : `a-85-339-word_1_230-4591.png`
 ![a336-21804.png](Glyphs/auto-extracted/a/a-85-339-word_1_230-4591.png)
 
-Les glyphes extraits sont directement placés dans des dossiers portant leur nom, pour gagner du temps sur l’étape de tri.
+Les glyphes extraits sont directement placés dans des dossiers portant leur nom, pour gagner du temps sur l’étape de tri
 
 ## Tri
 
@@ -38,6 +40,9 @@ le script va :
 * retrier les images en parcourant les fichiers de tri pour repérer les images dont le nom ne correspond pas au fichier dans lequel elle est. Renommer ces images pour qu’elles correspondent au dossier dans lequel elles sont.
 
 * modifier le nom du glyphe dans le fichier HOCR pour sauvegarder le tri
+
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
 
 Il faut vérifier à la main si une image ne correspond pas au dossier où elle est, la déplacer dans le fichier où elle devrait être ou la supprimer. Lancer le script pour mettre à jour leur nom et le fichier HOCR. Il faut aussi séparer les glyphes d’un autre style de caractère (italique, gras...).
 
@@ -60,6 +65,9 @@ python3.5 Toolbox/show_in_viewer.py [page-id_mot]
 Par exemple : `python3.5 Toolbox/show_in_viewer.py 343-word_1_203` ouvrira Firefox sur `localhost:8000/Toolbox/WebViewer/#343-word_1_203`, ainsi la bonne page sera chargée et le focus se fera sur le bon nœud du document HTML.
 Pour rendre accessible cette manipulation depuis un navigateur de fichier, sur GNU/linux, on rend le script exécutable `chmod +x Toolbox/show_in_viewer.py`, puis on configure son gestionnaire de fichier pour pouvoir accéder au script depuis le menu `ouvrir avec...` pour que tous les .png puisse être ouvert avec notre programme.
 
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
+
 *`click droit` sur l’image du glyphe, `ouvrir avec...` -> `showinviewer.py`*
 ![](Glyphs/showinviewer.png)
 
@@ -80,6 +88,9 @@ Automatisé dans le script : `Toolbox/average.py`
 <code>python3.5 Toolbox/average.py -t Glyphes/extractionAutomatique-sorted/a/ Glyphes/extractionAutomatique-sorted/b/ Glyphes/extractionAutomatique-sorted/c -o Glyphes/average/</code>
 </pre>
 
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
+
 ![index2.jpg](Glyphs/index2.jpg)
 
 ## Contraste de l’image et graisse du glyphe
@@ -87,17 +98,16 @@ Automatisé dans le script : `Toolbox/average.py`
 A partir de cette image moyenne, avant de la vectoriser, il faut augmenter ses contrastes.
 Les contours flous de cette forme permettent déjà de choisir la graisse  des glyphes. Pour illustrer l’opération, avec [gimp](gimp), on augmente la résolution de l’image puis on utilise l’outil **Niveaux**.
 
-*avant:*
+*avant:* <div class="imgMidSize">![avant](Glyphs/gimpNiveauxAvant.png)</div>
 
-![avant](Glyphs/gimpNiveauxAvant.png)
+*après:* <div class="imgMidSize">![après](Glyphs/gimpNiveauxApres.png)</div>
 
-*après:*
 
-![après](Glyphs/gimpNiveauxApres.png)
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
+
 
 `120 + 130 / 2 = 125` <-- numéro du niveau
-
-![n50](Glyphs/clean/a100-n50.png)![n90](Glyphs/clean/a100-n90.png)![n125](Glyphs/clean/a100-n125.png)![n180](Glyphs/clean/a100-n180.png)
 
 [Un point sur les épaisseurs de typographie](http://bigelowandholmes.typepad.com/bigelow-holmes/2015/07/on-font-weight.html)
 
@@ -106,6 +116,7 @@ Les contours flous de cette forme permettent déjà de choisir la graisse  des g
 ou alors avec [ImageMagick](https://www.imagemagick.org/Usage/color_mods/#level) :
 <pre>
 <code>convert {imgSource} -level {mini},{max} {imgOutput}</code>
+#exemple :
 <code>convert Glyphs/clean/a100.png -level 45%,55% Glyphs/clean/a100-50pc.png #45% + 55% / 2 = 50pc</code> <-- pourcentage du niveau.
 </pre>
 
@@ -120,13 +131,19 @@ avec le script `Toolbox/level.py`
 * génère les différents contrastes
 
 <div class="flex-tier">![](Glyphs/levels/à15pc50d.png)![](Glyphs/levels/à30pc50d.png)![](Glyphs/levels/à60pc50d.png)</div>
-![](Glyphs/GIF.gif)
+
+<div class="gifNoPrint">![](Glyphs/GIF.gif)</div>
+
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
 
 ## Vectorisation
 avec Inkscape en mode GUI ou ligne de commande, ou directement avec [Potrace](http://potrace.sourceforge.net/) puis retouche et simplification du tracé avec Inkscape.
 <pre>
-<code>inkscape -f clean/a100.png --select image10 --verb SelectionTrace</code> #ouvre l’interface graphique d’inkscape directement avec l’outil de vectorisation ouvert
-<code>potrace clean/a100.bmp -s -o test.svg</code> #vectorisation en ligne de commande (voir man potrace)
+<code>inkscape -f clean/a100.png --select image10 --verb SelectionTrace</code>
+# ouvre l’interface graphique d’inkscape directement avec l’outil de vectorisation ouvert
+<code>potrace clean/a100.bmp -s -o test.svg</code>
+# vectorisation en ligne de commande (voir man potrace)
 </pre>
 `potrace clean/a100.bmp -s -o -a test2.svg`![](Glyphs/clean/test2.svg) `potrace a100.bmp -s --opttolerance 1 -o test4.svg` ![](Glyphs/clean/test4.svg) `potrace a100.bmp -s --opttolerance 2 -o test5.svg` ![](Glyphs/clean/test5.svg)
 
@@ -149,6 +166,9 @@ simplification réalisée avec inkscape :
 ![0 simplification](Glyphs/a30-vectInk-simp0-viz.svg)![1 simplification](Glyphs/a30-vectInk-simp1-viz.svg)![2 simplifications](Glyphs/a30-vectInk-simp2-viz.svg)![8 simplifications](Glyphs/a30-vectInk-simp8-viz.svg)![17 simplifications](Glyphs/a30-vectInk-simp17-viz.svg)![24 simplifications](Glyphs/a30-vectInk-simp24-viz.svg)
 
 *(to do : faire un script qui simplifie et sauvegarde le tracé une 30ene de fois et qui génère le html pour la visionneuse.)*
+
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
 
 ### Script `vectorize.py`
 

@@ -1,3 +1,6 @@
+<div style="page-break-after: always;"></div>
+
+
 # Analyse de mise en page
 
 ### HOCR ou PAGE ?
@@ -25,23 +28,25 @@ git clone https://github.com/nickjwhite/tesseract.git --branch hocrcharboxes --s
 <div class="preblack">
 ```
 ...
-<p class='ocr_par' lang='deu' title="bbox930">
+<p class='ocr_par' lang='fra' title="bbox930">
   <span class='ocr_line' title="bbox 348 797 1482 838; baseline -0.009 -6">
-    <span class='ocrx_word' title='bbox 348 805 402 832; x_wconf 93'>Die</span>
-    <span class='ocrx_word' title='bbox 421 804 697 832; x_wconf 90'>Darlehenssumme</span>
-    <span class='ocrx_word' title='bbox 717 803 755 831; x_wconf 96'>ist</span>
-    <span class='ocrx_word' title='bbox 773 803 802 831; x_wconf 96'>in</span>
-    <span class='ocrx_word' title='bbox 821 803 917 830; x_wconf 96'>ihrem</span>
-    <span class='ocrx_word' title='bbox 935 799 1180 838; x_wconf 95'>ursprünglichen</span>
-    <span class='ocrx_word' title='bbox 1199 797 1343 832; x_wconf 95'>Umfange</span>
-    <span class='ocrx_word' title='bbox 1362 805 1399 823; x_wconf 95'>zu</span>
-    <span class='ocrx_word' title='bbox 1417 x_wconf 96'>ver-</span>
+    <span class='ocrx_word' title='bbox 348 805 402 832; x_wconf 93'>
+      Un
+    </span>
+    <span class='ocrx_word' title='bbox 421 804 697 832; x_wconf 90'>
+      autre
+    </span>
+    <span class='ocrx_word' title='bbox 717 803 755 831; x_wconf 96'>
+      mote
+    </span>
   </span>
-  ...
+</p>
+...
 ```
 </div>
 
 <div style="page-break-after: always;"></div>
+<div class="margin"></div>
 
 ## Analyse
 Analyses de mise en page réalisées sur les fichiers dans */Pages*.
@@ -75,8 +80,10 @@ Avec le script : `Toolbox/olr-analyse.py`
 <code>python3.5 Toolbox/olr-analysis.py -t Pages/ -o Layout/hocr-charboxes/ -l fra</code>
 </pre>
 
+## Correction
 
-## hocr-tools
+### hocr-tools
+
 [hocr](https://github.com/tmbdev/hocr-tools#running-the-full-test-suite) est une boite à outil écrite en Python pour valider et corriger les fichiers *.HOCR*
 
 ```
@@ -93,7 +100,11 @@ Générer un pdf "recherchable" : `hocr-pdf . > hocr.pdf` dans un dossier où i
 
 Il est possible de corriger les fichiers hOCR à partir de fichiers txt ligne par ligne corrigés à la main. (pas encore testé mais cela ne règle pas le problème des césures)
 
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
+
 ## WebViewer
+
 Visionneuse d’analyses de mise en page (layout) en HTML sur les scans des pages.
 ```
 python3.5 -m http.server 8000
@@ -102,6 +113,13 @@ ou pour lancer le serveur et configurer l’appli :
 ```
 python3.5 Toolbox/run-web-viewer.py
 ```
+  * lance un serveur local
+  * édite le fichier de configuration `Toolbox/WebViewer/config.json`
+
 Ouvrir le navigateur et entrer l’url : `localhost:8000/Toolbox/WebViewer`
 
 ![webViewer](Layout/webViewer.png)
+
+Cette interface permet aussi de modifier les fichiers *hOCRs* en redimensionant les contours des zones et en cliquant sur *Save Edition*
+
+![webViewer](Layout/edit-webViewer.png)

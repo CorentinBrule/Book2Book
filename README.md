@@ -1,3 +1,6 @@
+<div>
+<img id="background" src="background.svg.png" style="display:none"></img>
+</div>
 # Book2Book
 
 est un ensemble d’outils pour produire *une mise en page à partir d’un spécimen*. À partir d’un livre numérisé, l’objectif est d’extraire, de conserver et de réutiliser tous les éléments permettant sa *re-production*.
@@ -25,19 +28,19 @@ est un ensemble d’outils pour produire *une mise en page à partir d’un spé
 <pre class="preblack">
 .
 ├── config.yaml
-├── Book                       # livre numérisé en PDF
-├── Font                       # éléments relatifs aux fontes du livre
-├── Glyphs                     # les glyphes extraits pour regénérer leur dessin
+├── Book                      # livre numérisé en PDF
+├── Font                      # éléments relatifs aux fontes du livre
+├── Glyphs                    # les images des glyphes        
 │   ├── auto-extracted
 │   ├── average
 │   ├── clean
 │   ├── levels
 │   ├── specialChar
 │   └── vectors
-├── Layout                     # informations de mise en page
+├── Layout                    # informations de mise en page
 │   ├── hocr-charboxes
-├── Pages                      # images des pages préparées pour le traitement
-└── Toolbox                    # intégralité des outils de Book2Book
+├── Pages                     # images des pages préparées pour le traitement
+└── Toolbox                   # intégralité des outils de Book2Book
     ├── BookScanner
     ├── extensionInkscape
     └── WebViewer
@@ -45,7 +48,8 @@ est un ensemble d’outils pour produire *une mise en page à partir d’un spé
 
 Ceci est une proposition de nomenclature qui peut être changée dans le fichier de configuration `config.yaml`.
 
-<div style="page-break-after: always;"></div>
+<div style="page-break-before: always; margin-bottom:1cm;"></div>
+<div class="margin"></div>
 
 ## Comment fonctionne cette documentation ?
 
@@ -55,15 +59,24 @@ Ceci est une proposition de nomenclature qui peut être changée dans le fichier
 * Ces documents décrivent les étapes d’un projet en expliquant le fonctionnement des principaux outils (de leur installation à leur usage dans le cadre de ce projet), ainsi que des commentaires sur les choix techniques, des astuces et des éléments auquel il faut être vigilant.
 * *Si une documentation bavarde vous dérange, se référer au diagramme*
 
-## OLR
+Pour la compiler en HTML :
+
+```
+pandoc -s -c README.css -f markdown -t html5 README.md BOOK.md LAYOUT.md GLYPHS.md FONT.md -o README.html
+```
+
+## Optical Layout Recognition
 
 *OLR* pour *Optical Layout Recognition* est un domaine de recherche du *traitement et analyse d'image*. De la même manière que l'*OCR* à pour mission de reconnaitre et traduire du texte dans des images, l'*OLR* analyse et encode tout les autres éléments de mise en page d'un document à partir d'une image. L'*OLR* est en réalité la première étape d'une reconnaissance de caractère en permettant de décomposer le document en différentes zones d'intéret à traiter (paragraphes, lignes, mots...). En plus de connaitre la position du texte sur le format, on peut en tirer des informations *sémantiques* (les titres, les chapôs, les paragraphes) et *typographiques* (la police, la graisse, l'interlignage...). En regroupant toutes ces strates d'informations :
 
 * textuelles (le contenu)
 * sémantique (la structure du document)
 * graphique (la mise en page et la caractérisation des éléments graphiques)
-
+<div style="height:80%;">
 ![Image du projet http://www.europeana-newspapers.eu/](Layout/olr.jpg)
+</div>
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
 
 ## Imitation typographique
 

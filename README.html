@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="README.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div id="background">
+
+</div>
+<h1 id="book2book">Book2Book</h1>
+<p>est un ensemble d’outils pour produire <em>une mise en page à partir d’un spécimen</em>. À partir d’un livre numérisé, l’objectif est d’extraire, de conserver et de réutiliser tous les éléments permettant sa <em>re-production</em>.</p>
+<ul>
+<li>Plusieurs sources de numérisations</li>
+<li>Extraction des contenus textuels (texte brut) et para-textuels (style, mise en page)</li>
+<li>Re-fabrication des éléments de mise en page (typographie, métriques, maquette)</li>
+<li>Génération de fac-similé à partir du texte et de la mise en page extraite</li>
+</ul>
+<p>Le projet consiste en une succession de scripts <em>Python</em> qui articule différents outils <em>libres ou open-sources</em> en normalisant leurs entrées et leurs sorties dans une architecture de projet claire. La plupart des autres opérations consistent en l’automatisation de manipulations bureautiques (copié, collé, renommer) et de traitement d’image simple (faire une moyenne, un niveau...). Chaque étape est conservée pour permettre de vérifier, corriger ou détourner les différentes formes intermédiaires générées. Un fichier de configuration centralise toutes les variables nécessaires à cette chaîne d’opérations.</p>
+<h2 id="résumé-des-étapes-de-traitement">Résumé des étapes de traitement:</h2>
+<ol type="1">
+<li>Récupérer le livre numérisé depuis différentes sources (GoogleBooks ou une numérisation à la main)</li>
+<li>Décomposer et préparer les pages</li>
+<li>Extraire le contenu textuel et les informations para-textuelles (mise en page)</li>
+<li>Extraire chaque image de chaque glyphe de chaque page</li>
+<li>Récupérer les informations de métriques des fontes</li>
+<li>Générer le contours moyen de chaque glyphe de chaque fonte</li>
+<li>Créer les fontes et y importer les contours des glyphes</li>
+<li>Configurer les métriques et diacritiques des fontes</li>
+</ol>
+<h2 id="architecture-des-projets">Architecture des projets:</h2>
+<pre class="preblack">
+.
+├── config.yaml
+├── Book                      # livre numérisé en PDF
+├── Font                      # éléments relatifs aux fontes du livre
+├── Glyphs                    # les images des glyphes        
+│   ├── auto-extracted
+│   ├── average
+│   ├── clean
+│   ├── levels
+│   ├── specialChar
+│   └── vectors
+├── Layout                    # informations de mise en page
+│   ├── hocr-charboxes
+├── Pages                     # images des pages préparées pour le traitement
+└── Toolbox                   # intégralité des outils de Book2Book
+    ├── BookScanner
+    ├── extensionInkscape
+    └── WebViewer
+</pre class="preblack">
+<p>Ceci est une proposition de nomenclature qui peut être changée dans le fichier de configuration <code>config.yaml</code>.</p>
+<div style="page-break-before: always; margin-bottom:1cm;">
+
+</div>
+<div class="margin">
+
+</div>
+<h2 id="comment-fonctionne-cette-documentation">Comment fonctionne cette documentation ?</h2>
+<ul>
+<li>Un diagramme basé sur les graphes de flux présente les outils principaux, leurs dépendances et leurs interactions.<code>LOOKME.svg</code></li>
+<li>Les exemples partent toujours du postulat que l’on se trouve à la racine du projet (<code>.</code>) et que l’on utilise la nomenclature par défaut.</li>
+<li>Le détail de l’outil est développé dans des documents séparés <code>README.md</code> à la racine des différents dossiers pré-existants (voir Architecture des projets).</li>
+<li>Ces documents décrivent les étapes d’un projet en expliquant le fonctionnement des principaux outils (de leur installation à leur usage dans le cadre de ce projet), ainsi que des commentaires sur les choix techniques, des astuces et des éléments auquel il faut être vigilant.</li>
+<li><em>Si une documentation bavarde vous dérange, se référer au diagramme</em></li>
+</ul>
+<p>Pour la compiler en HTML :</p>
+<pre><code>pandoc -s -c README.css -f markdown -t html5 README.md BOOK.md LAYOUT.md GLYPHS.md FONT.md -o README.html</code></pre>
+<h2 id="optical-layout-recognition">Optical Layout Recognition</h2>
+<p><em>OLR</em> pour <em>Optical Layout Recognition</em> est un domaine de recherche du <em>traitement et analyse d'image</em>. De la même manière que l'<em>OCR</em> à pour mission de reconnaitre et traduire du texte dans des images, l'<em>OLR</em> analyse et encode tout les autres éléments de mise en page d'un document à partir d'une image. L'<em>OLR</em> est en réalité la première étape d'une reconnaissance de caractère en permettant de décomposer le document en différentes zones d'intéret à traiter (paragraphes, lignes, mots...). En plus de connaitre la position du texte sur le format, on peut en tirer des informations <em>sémantiques</em> (les titres, les chapôs, les paragraphes) et <em>typographiques</em> (la police, la graisse, l'interlignage...). En regroupant toutes ces strates d'informations :</p>
+<ul>
+<li>textuelles (le contenu)</li>
+<li>sémantique (la structure du document)</li>
+<li>graphique (la mise en page et la caractérisation des éléments graphiques)
+<div style="height:80%;">
+<figure>
+<img src="Layout/olr.jpg" alt="Image du projet http://www.europeana-newspapers.eu/" /><figcaption>Image du projet http://www.europeana-newspapers.eu/</figcaption>
+</figure>
+</div>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div></li>
+</ul>
+<h2 id="imitation-typographique">Imitation typographique</h2>
+<p>Rendre disponible des dessins typographiques anciens dans des standards numériques actuels est une activité commune dans le monde du design. Excercice de style, hommage, positionement sur un marché spécifique... Ce travail est celui de typographes qui réinterprettent les formes du passsé dans un objectif préçit et avec un process teinté de subjectivité.</p>
+<p>Des recherches scientifiques comme <a href="http://re-typograph.loria.fr/">Re-Typograph</a> proposent des processus d'objectivations de la forme pour une plus grande pertinance historique et technique (comme le <em>squelette générique</em>). C'est cette recherche de la reproduction parfaite qui les àmène, par exemple, à supprimer les imperfections de l'impression au plomb.</p>
+<figure>
+<img src="Re-Typograph.jpg" alt="Re-Typograph Phase I: a Proof-of-Concept for Typeface Parameter Extraction from Historical Documents" /><figcaption>Re-Typograph Phase I: a Proof-of-Concept for Typeface Parameter Extraction from Historical Documents</figcaption>
+</figure>
+<p>Cette démarche est complémentaire aux deux autres. Le traitement formels est basique et ignore les spécificités technique et historique des spécimens, proposant une arpoche plus photographique que typographique. Toutes les caractéristiques du fac-similé sont intégrées dans la création des nouvelles formes (les défaut d'impression, de conservation, de numérisation), ne cherchant pas à créer un <em>idéal numérique</em> d'un document historique mais un outil de <em>re-production numérique</em>.</p>
+<p>La démarche d'ouverture de ce projet est surtout une tentative de ré-intégration des outils mathématiques et scientifique dans une pratique de création de forme.</p>
+<h3 id="étapes-intermédiaire"> étapes intermédiaire</h3>
+<pre><code>LC_COLLATE=C ls|grep png &gt; file.txt
+convert -delay 50 -quality 95 `cat file.txt` -gravity center -fill White -extent 1000x1000 level.mpg</code></pre>
+<div style="page-break-after: always;">
+
+</div>
+<h1 id="numérisation-des-documents">Numérisation des documents</h1>
+<p>La première étape avant de reproduire un document est d'en posséder une version numérique. Pour celà, il existe deux possiblités :</p>
+<ul>
+<li>Numériser le document soi-même.</li>
+<li>Récupérer un fichier déjà existant.</li>
+</ul>
+<p>Dans tout les cas, la qualité et la résolution de la numérisation aura un impact dans tout le processus de numérisation.</p>
+<h2 id="les-plateformes">Les plateformes :</h2>
+<p>Il existe de nombreuses plateformes qui proposent des documents à télécharger. En effet, ... Dans le cas des œuvres du domaine public, le leader de la numérisation est GoogleBooks...</p>
+<p>Par exemple ce livre de 1839 n'est disponible (pour le moment) que sur GoogleBooks :</p>
+<figure>
+<img src="Book/industrie_francaise.png" />
+</figure>
+<p>et (pas encore) sur <em>Internet Archive</em></p>
+<figure>
+<img src="Book/internetarchive_not_found.png" />
+</figure>
+<p><em>&quot;Peu importe ! Tant qu'il est disponible gratuitement...&quot;</em></p>
+<p>Mais la license de GoogleBooks est, entre autre, imcompatible avec <em>Wikipedia</em>. Car Google interdit les usages comercials de ces scans d'œuvres élevé depuis longtemps dans le <em>domaine public</em>. Ce qui amène à des situations paradoxales comme celle-ci :</p>
+<figure>
+<img src="Book/wiki_Irony_punctuation.png" />
+</figure>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<p>L'article ne peut pas intégrer directement les passages intéressants. Une citation ne suffisant pas car l'article parle spécifiquement d'éléments graphiques de cet ouvrage. Le sourçage reste indirecte et l'information est plus complexe à transmettre sans illustrations.</p>
+<figure>
+<img src="Book/googlebooks_watermark.png" />
+</figure>
+<p>Ce filigrame est la marque de propriété de l'entreprise américaine sur l'image du livre.</p>
+<figure>
+<img src="Book/googlebooks_contract.png" />
+</figure>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<h3 id="tpb.py-bot-de-transfert-googlebooks---internetarchive"><code>tpb.py</code> : bot de transfert GoogleBooks -&gt; InternetArchive</h3>
+<p>Automatiser des action sur le web en simulant une activité <em>humaine</em> avec la librairie python <code>silenium</code>. Ce script utilise le driver de <em>Firefox</em> disponible sur le <a href=""></a></p>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<h2 id="diybookscanner">DIYBookScanner :</h2>
+<p>La possession des outils de numérisation devient donc importante pour permettre le partage du patrimoine écrit. Si le scanner à plat s'est démocratisé avec l'imprimante de bureau, il ne convient pas aux formes reliées. C'est pour cela que des comunautés travails sur des outils de numérisation DIY et open source pour rendre accéssible à ceux qui veulent partager leur livres comme ils l'entendent.</p>
+<p><a href="http://diybookscanner.org/">DIYBookScanner.org</a> regroupe par exemple des dizaines de designs différents de dispositif pour photographier les pages d'un livre dans les meilleurs conditions, selon les moyens et les compétences de chacuns.</p>
+<figure>
+<img src="Book/diy_book_scanner_schema.png" />
+</figure>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<h3 id="bookscanner.py"> <code>bookscanner.py</code></h3>
+Ce script est basé sur la librairie <code>gphoto2</code> qui permet de contrôler les boiters d'appareil photo numérique.
+<pre>
+<code>gphoto2 --auto-detect</code> # lister les APN branché à l'ordinateur
+<code>gphoto2 --capture-image</code> # prendre une photo
+</pre>
+<p>Si on veut automatiser la prise de vue par ce dispositif, il faut choisir des APN compatibles avec la librairie (liste dispo avec <code>--list-cameras</code>) et jongler avec les modes de communication <em>PTP</em> ou <em>MTP</em></p>
+<p><code>bookscanner.py</code> utilse le wrapper python de la librairie :</p>
+<pre><code>apt install libgphoto* &amp;&amp; pip install gphoto2-cffi</code></pre>
+<p>Le script permet de controler le ou les appareils photos en déclanchant la prise de vue et en téléchargeant l'image sur la machine. Dans l'état, il est controlé par un signal en <em>série</em> pouvant venir d'un <em>Arduino</em>.</p>
+<p>Le reste du traitement des images se fait avec l'interface graphique de <a href="http://scantailor.org">ScanTailor</a></p>
+<div style="page-break-after: always;">
+
+</div>
+<h1 id="analyse-de-mise-en-page">Analyse de mise en page</h1>
+<h3 id="hocr-ou-page">HOCR ou PAGE ?</h3>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/HOCR">HOCR</a> est un format de donnée de &quot;OLR&quot; (Optical Layout Recognition) basé sur le html. L’outil en ligne de commande de <a href="https://github.com/tesseract-ocr/tesseract">Tesseract</a> avec l’option HOCR ne s’arrêtait qu’au niveau des mots.</li>
+<li>Le labo de recherche <a href="http://primaresearch.org">PRImA</a> a développé son propre format le PAGE basé sue le xml. Ils proposent des outils open-source pour les visualiser et les éditer mais l’outil permettant de générer ces analyses n’est disponible que sur Windows et les sources sont introuvables. Pourtant TPT utilise <em>Tesseract</em> et permet de générer un OLR jusqu’au niveau des caractères. (Possibilité de convertir le HORC en PAGE avec <a href="http://www.prima.cse.salford.ac.uk/tools/PAGEConverterValidator">PAGEConverterValidator</a>)</li>
+</ul>
+<p><strong>Mais :</strong></p>
+Pour dessiner les contours des glyphes qui composent le document, nous avons besoin de connaître les coordonnées et les dimensions de chacune d’entre elle. Les documents de OLR doivent donc comprendre toute l’arborescence de la mise en page, jusqu’aux caractères.
+<div class="flex-tier">
+<p><em>voir :</em> <a href="https://github.com/tesseract-ocr/tesseract/issues/135">issue #135</a> et la <a href="https://github.com/tesseract-ocr/tesseract/issues/310">pull request #310</a> du projet <em>Tesseract</em>.</p>
+<div style="width:100%;">
+<img src="Layout/issue135-1.png" alt="issue135" />
+</div>
+<p>L’option <code>hocr_char_boxes</code> n’est pas disponible dans la version 3.04.01 dispo sur Debian Stretch (ni la branche master 4.00.00alpha). Il faut donc compiler un <a href="https://github.com/nickjwhite/tesseract/tree/hocrcharboxes">fork de la 3.05</a> <a href="https://github.com/tesseract-ocr/tesseract/wiki/Compiling-%E2%80%93-GitInstallation">avec ce tuto</a>. Ne pas oublier <a href="https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-304305">le(s) fichier(s) de langue et d’osd</a> à mettre dans <code>/usr/local/share/tessdata/</code> ou spécifier à la main avec l’option <code>--tessdate-dir</code></p>
+</div>
+<pre><code>git clone https://github.com/nickjwhite/tesseract.git --branch hocrcharboxes --single-branch tesseract-hocrcharboxes</code></pre>
+<h3 id="structure-dun-document-hocr">Structure d'un document <em>hOCR</em></h3>
+<div class="preblack">
+<pre><code>...
+&lt;p class=&#39;ocr_par&#39; lang=&#39;fra&#39; title=&quot;bbox930&quot;&gt;
+  &lt;span class=&#39;ocr_line&#39; title=&quot;bbox 348 797 1482 838; baseline -0.009 -6&quot;&gt;
+    &lt;span class=&#39;ocrx_word&#39; title=&#39;bbox 348 805 402 832; x_wconf 93&#39;&gt;
+      Un
+    &lt;/span&gt;
+    &lt;span class=&#39;ocrx_word&#39; title=&#39;bbox 421 804 697 832; x_wconf 90&#39;&gt;
+      autre
+    &lt;/span&gt;
+    &lt;span class=&#39;ocrx_word&#39; title=&#39;bbox 717 803 755 831; x_wconf 96&#39;&gt;
+      mote
+    &lt;/span&gt;
+  &lt;/span&gt;
+&lt;/p&gt;
+...</code></pre>
+</div>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<h2 id="analyse">Analyse</h2>
+<p>Analyses de mise en page réalisées sur les fichiers dans <em>/Pages</em>.</p>
+<ul>
+<li><a href="https://github.com/tesseract-ocr/tesseract">Tesseract</a> -&gt; <strong>HOCR</strong>(html) : zones et mots:
+<ul>
+<li>code : <code>tesseract -l fra [input image] [output file] hocr</code></li>
+<li><em>/Layout/hocr</em></li>
+</ul></li>
+<li>[Tesseract charboxes] -&gt; <strong>HOCR</strong>(html) : zones, lignes, mots et glyphes :
+<ul>
+<li>code : <code>tesseract {image file} -c tessedit_create_hocr=1 -c hocr_char_boxes=1 {output name}</code></li>
+<li><em>/Layout/hocr-charboxes</em></li>
+</ul></li>
+<li><a href="http://www.prima.cse.salford.ac.uk/tools/TesseractOCRToPAGE">PRImA Tesseract OCR to PAGE</a> (disponible que sur windows)
+<ul>
+<li>-&gt; <strong>PAGE</strong>(xml) : zones:
+<ul>
+<li>code : <code>...</code></li>
+<li><em>/Layout/T2P-layout</em></li>
+</ul></li>
+<li>-&gt; <strong>PAGE</strong>(xml) : zones, lignes, mots et glyphes :
+<ul>
+<li>code : <code>...</code></li>
+<li><em>/Layout/T2P-layout-glyphs</em></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>Avec le script : <code>Toolbox/olr-analyse.py</code></p>
+<pre>
+<code>python3.5 Toolbox/olr-analysis.py [-c CONFIGFILE] [-t TARGET [TARGET ...]] [-o OUTPUT] [-l LANG]</code>
+# exemple:
+<code>python3.5 Toolbox/olr-analysis.py -t Pages/ -o Layout/hocr-charboxes/ -l fra</code>
+</pre>
+<h2 id="correction">Correction</h2>
+<h3 id="hocr-tools">hocr-tools</h3>
+<p><a href="https://github.com/tmbdev/hocr-tools#running-the-full-test-suite">hocr</a> est une boite à outil écrite en Python pour valider et corriger les fichiers <em>.HOCR</em></p>
+<pre><code>hocr-combine Layout/hocr-charboxes/*.hocr &gt; Layout/p336-p356.html</code></pre>
+<p>ensuite, pour suivre la <a href="https://github.com/jbaiter/hocrviewer-mirador#data-format">specification du format pour la visionneuse</a> on applique au document le regex suivant :</p>
+<ul>
+<li><p>rechercher : <code>id=&quot;page_1&quot; title=&quot;image &amp;quot;Pages/p(\d+)\.png&amp;quot;; bbox (\d+ \d+ \d+ \d+); ppageno \d+&quot;</code></p></li>
+<li><p>remplacer :<code>id=&quot;page_$1&quot; title=&quot;image ../Pages/p$1.png; bbox $2; ppageno $1&quot;</code></p></li>
+</ul>
+<p>Générer un pdf &quot;recherchable&quot; : <code>hocr-pdf . &gt; hocr.pdf</code> dans un dossier où il y a un fichier <em>HOCR</em> pour un <em>JPEG</em> (ex : Layout/hocr-charboxes/)</p>
+<p>Il est possible de corriger les fichiers hOCR à partir de fichiers txt ligne par ligne corrigés à la main. (pas encore testé mais cela ne règle pas le problème des césures)</p>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<h2 id="webviewer">WebViewer</h2>
+<p>Visionneuse d’analyses de mise en page (layout) en HTML sur les scans des pages.</p>
+<pre><code>python3.5 -m http.server 8000</code></pre>
+<p>ou pour lancer le serveur et configurer l’appli :</p>
+<pre><code>python3.5 Toolbox/run-web-viewer.py</code></pre>
+<ul>
+<li>lance un serveur local</li>
+<li>édite le fichier de configuration <code>Toolbox/WebViewer/config.json</code></li>
+</ul>
+<p>Ouvrir le navigateur et entrer l’url : <code>localhost:8000/Toolbox/WebViewer</code></p>
+<figure>
+<img src="Layout/webViewer.png" alt="webViewer" /><figcaption>webViewer</figcaption>
+</figure>
+<p>Cette interface permet aussi de modifier les fichiers <em>hOCRs</em> en redimensionant les contours des zones et en cliquant sur <em>Save Edition</em></p>
+<figure>
+<img src="Layout/edit-webViewer.png" alt="webViewer" /><figcaption>webViewer</figcaption>
+</figure>
+<div style="page-break-after: always;">
+
+</div>
+<h1 id="dessin-de-caractère-à-partir-des-scans-des-glyphes">Dessin de caractère à partir des scans des glyphes :</h1>
+<div class="margin">
+
+</div>
+<h2 id="extraction">Extraction</h2>
+<h3 id="depuis-des-fichiers-hocr">depuis des fichiers HOCR</h3>
+Les images des glyphes sont extraits avec le script <code>/Toolbox/extract-images-from-HOCR.py</code> :
+<pre>
+<code>python3.5 Toolbox/extract-images-from-HOCR.py [-c CONFIGFILE] [-H HOCR [HOCR ...]][-i IMAGE [IMAGE ...]] [-m MARGIN] [-o OUTPUT]</code>
+# exemple :
+<code>python3.5 Toolbox/extract-images-from-HOCR.py -H Layout/hocr-charboxes/ -i Pages/ -o Glyphes/auto-extracted/ -m 2</code></pre>
+<p>elles sont enregistrées sous la forme : <code>glyph-confiance-page-id_mot-numéro.png</code></p>
+<ul>
+<li><code>glyph</code> : caractère ou nom du glyphe</li>
+<li><code>confiance</code> : score de confiance du logiciel OCR en %</li>
+<li><code>page</code> : numéro de la page</li>
+<li><code>id_mot</code> : attribut &quot;id&quot; du mot (parent direct) du glyphe dans le fichier HOCR (<code>#word_1_numéroDuMot</code>)</li>
+<li><code>numéro</code> : numéro du glyph dans la page</li>
+</ul>
+<p>exemple : <code>a-85-339-word_1_230-4591.png</code> <img src="Glyphs/auto-extracted/a/a-85-339-word_1_230-4591.png" alt="a336-21804.png" /></p>
+<p>Les glyphes extraits sont directement placés dans des dossiers portant leur nom, pour gagner du temps sur l’étape de tri</p>
+<h2 id="tri">Tri</h2>
+Le script <code>/Toolbox/sort-image-of-char.py</code>
+<pre>
+<code>python3.5 Toolbox/sort-image-of-char.py [-c CONFIGFILE] [-r ROOTFOLDER] [-o OUTPUT] [-n] [--hocrI HOCRI] [--hocrO HOCRO]</code>
+# exemple :
+<code>python3.5 Toolbox/sort-image-of-char.py -r Glyphes/auto-extracted/ --hocrI Layout/hocr-originaux --hocrO Layout/hocr-modifié</code>
+</pre>
+<p>le script va :</p>
+<ul>
+<li><p>trier les images à la racine, celles qui ne sont pas triées. Il identifie le caractère de l’image par le premier élément de son titre. Il crée un dossier pour ce caractère si il n’existe pas encore. Il déplace l’image dans le dossier correspondant.</p></li>
+<li><p>retrier les images en parcourant les fichiers de tri pour repérer les images dont le nom ne correspond pas au fichier dans lequel elle est. Renommer ces images pour qu’elles correspondent au dossier dans lequel elles sont.</p></li>
+<li><p>modifier le nom du glyphe dans le fichier HOCR pour sauvegarder le tri</p></li>
+</ul>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<p>Il faut vérifier à la main si une image ne correspond pas au dossier où elle est, la déplacer dans le fichier où elle devrait être ou la supprimer. Lancer le script pour mettre à jour leur nom et le fichier HOCR. Il faut aussi séparer les glyphes d’un autre style de caractère (italique, gras...).</p>
+<figure>
+<img src="Glyphs/exempleTri.png" alt="exempleTri" /><figcaption>exempleTri</figcaption>
+</figure>
+<p><em>préciser un fichier <code>hocrO</code> pour ne pas sauvegarder dans le fichier originel</em></p>
+<p><em>TODO : vérifier que ces sous-dossiers de style de caractère ne pose pas de problème au script</em></p>
+<p><img src="Glyphs/a.1713.gif" alt="1713 a" /><img src="Glyphs/b.259.gif" alt="259 b" /><img src="Glyphs/c.669.gif" alt="669 c" /><img src="Glyphs/d.970.gif" alt="259 b" /><img src="Glyphs/e.3630.gif" alt="259 b" /><img src="Glyphs/f.198.gif" alt="259 b" /><img src="Glyphs/g.367.gif" alt="259 b" /><img src="Glyphs/h.151.gif" alt="259 b" /><img src="Glyphs/i.1801.gif" alt="259 b" /><img src="Glyphs/j.46.gif" alt="259 b" /><img src="Glyphs/k.2.gif" alt="259 b" /><img src="Glyphs/l.1376.gif" alt="259 b" /><img src="Glyphs/m.590.gif" alt="259 b" /><img src="Glyphs/n.1689.gif" alt="259 b" /><img src="Glyphs/o.1317.gif" alt="259 b" /><img src="Glyphs/p.870.gif" alt="259 b" /><img src="Glyphs/q.334.gif" alt="259 b" /><img src="Glyphs/r.1801.gif" alt="259 b" /><img src="Glyphs/s.2085.gif" alt="259 b" /><img src="Glyphs/t.1611.gif" alt="259 b" /><img src="Glyphs/u.1544.gif" alt="259 b" /><img src="Glyphs/v.342.gif" alt="259 b" /><img src="Glyphs/w.2.gif" alt="259 b" /><img src="Glyphs/x.142.gif" alt="259 b" /><img src="Glyphs/y.66.gif" alt="259 b" /><img src="Glyphs/z.24.gif" alt="259 b" /></p>
+<p><em>mieux automatiser la création des gifs et générer un fichier markdown avec tous les noms des gif crées pour rapidement vérifier les tris</em></p>
+<h3 id="ouvrir-dans-la-visionneuse">Ouvrir dans la visionneuse</h3>
+<p>Pour accélérer le tri, on peut vérifier sur l’image de la page, quelle caractère a été réellement scanné. Pour celà on peut mettre en place un raccourci pour ouvrir le <code>WebViewer</code> à la bonne page et centrer la vue sur la glyphe en question. Un script ouvre un navigateur web à l’adresse où la visionneuse est lancée avec comme arguments la page et l’id du mot parent du glyphe.</p>
+<pre><code>python3.5 Toolbox/show_in_viewer.py [page-id_mot]</code></pre>
+<p>Par exemple : <code>python3.5 Toolbox/show_in_viewer.py 343-word_1_203</code> ouvrira Firefox sur <code>localhost:8000/Toolbox/WebViewer/#343-word_1_203</code>, ainsi la bonne page sera chargée et le focus se fera sur le bon nœud du document HTML. Pour rendre accessible cette manipulation depuis un navigateur de fichier, sur GNU/linux, on rend le script exécutable <code>chmod +x Toolbox/show_in_viewer.py</code>, puis on configure son gestionnaire de fichier pour pouvoir accéder au script depuis le menu <code>ouvrir avec...</code> pour que tous les .png puisse être ouvert avec notre programme.</p>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<p><em><code>click droit</code> sur l’image du glyphe, <code>ouvrir avec...</code> -&gt; <code>showinviewer.py</code></em> <img src="Glyphs/showinviewer.png" /></p>
+<p><em>/! cette fonction lancera toujours le WebViewer du projet qui a été configuré. Si plusieurs projets sont en cours ou que le dossier du projet à été déplacé, il faudra éditer le script pour bien configurer les chemins à la main.</em></p>
+<h2 id="moyenne">Moyenne</h2>
+<p>Créer un caractère qui soit représentatif de l’ensemble des glyphes de l’extrait pour gommer et intégrer les erreurs d’impression. Faire la &quot;moyenne&quot; de tous les glyphes, c’est-à-dire superposer toutes les images du caractère en réduisant leurs opacités. On utilise pour cela la fonction <code>convert</code> de <a href="https://www.imagemagick.org/script/index.php">ImageMagick</a></p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">convert</span> [images...] -average average.png</code></pre></div>
+<p><img src="Glyphs/average/a.png" alt="a-average" /> Automatisé dans le script : <code>Toolbox/average.py</code></p>
+<pre>
+<code>python3.5 average.py [-c CONFIGFILE] [-t TARGETFOLDER [TARGETFOLDER ...]] [-o OUTPUT]</code>
+# exemple :
+<code>python3.5 Toolbox/average.py -t Glyphes/extractionAutomatique-sorted/a/ Glyphes/extractionAutomatique-sorted/b/ Glyphes/extractionAutomatique-sorted/c -o Glyphes/average/</code>
+</pre>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<figure>
+<img src="Glyphs/index2.jpg" alt="index2.jpg" /><figcaption>index2.jpg</figcaption>
+</figure>
+<h2 id="contraste-de-limage-et-graisse-du-glyphe">Contraste de l’image et graisse du glyphe</h2>
+<p>A partir de cette image moyenne, avant de la vectoriser, il faut augmenter ses contrastes. Les contours flous de cette forme permettent déjà de choisir la graisse des glyphes. Pour illustrer l’opération, avec <a href="gimp" class="uri">gimp</a>, on augmente la résolution de l’image puis on utilise l’outil <strong>Niveaux</strong>.</p>
+<em>avant:</em>
+<div class="imgMidSize">
+<img src="Glyphs/gimpNiveauxAvant.png" alt="avant" />
+</div>
+<em>après:</em>
+<div class="imgMidSize">
+<img src="Glyphs/gimpNiveauxApres.png" alt="après" />
+</div>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<p><code>120 + 130 / 2 = 125</code> &lt;-- numéro du niveau</p>
+<p><a href="http://bigelowandholmes.typepad.com/bigelow-holmes/2015/07/on-font-weight.html">Un point sur les épaisseurs de typographie</a></p>
+<p><em>la préparation des bitmap peut-être réalisée aussi avec <a href="http://potrace.sourceforge.net/mkbitmap.html">mkbitmap</a></em></p>
+ou alors avec <a href="https://www.imagemagick.org/Usage/color_mods/#level">ImageMagick</a> :
+<pre>
+<code>convert {imgSource} -level {mini},{max} {imgOutput}</code>
+#exemple :
+<code>convert Glyphs/clean/a100.png -level 45%,55% Glyphs/clean/a100-50pc.png #45% + 55% / 2 = 50pc</code> <-- pourcentage du niveau.
+</pre>
+avec le script <code>Toolbox/level.py</code>
+<pre>
+<code>python3.5 Toolbox/level.py [-c CONFIGFILE] [-m METRICS] [-t TARGET [TARGET ...]] [-o OUTPUT] [-l LEVEL [LEVEL ...]] [-d DELTA]</code>
+# exemple :
+<code>python3.5 Toolbox/level.py -t Glyphs/average/ -o Glyphs/levels/ -l 15 30 60</code>
+</pre>
+<ul>
+<li>agrandit la taille des images</li>
+<li>génère les différents contrastes</li>
+</ul>
+<div class="flex-tier">
+<img src="Glyphs/levels/à15pc50d.png" /><img src="Glyphs/levels/à30pc50d.png" /><img src="Glyphs/levels/à60pc50d.png" />
+</div>
+<div class="gifNoPrint">
+<img src="Glyphs/GIF.gif" />
+</div>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<h2 id="vectorisation">Vectorisation</h2>
+avec Inkscape en mode GUI ou ligne de commande, ou directement avec <a href="http://potrace.sourceforge.net/">Potrace</a> puis retouche et simplification du tracé avec Inkscape.
+<pre>
+<code>inkscape -f clean/a100.png --select image10 --verb SelectionTrace</code>
+# ouvre l’interface graphique d’inkscape directement avec l’outil de vectorisation ouvert
+<code>potrace clean/a100.bmp -s -o test.svg</code>
+# vectorisation en ligne de commande (voir man potrace)
+</pre>
+<p><code>potrace clean/a100.bmp -s -o -a test2.svg</code><img src="Glyphs/clean/test2.svg" /> <code>potrace a100.bmp -s --opttolerance 1 -o test4.svg</code> <img src="Glyphs/clean/test4.svg" /> <code>potrace a100.bmp -s --opttolerance 2 -o test5.svg</code> <img src="Glyphs/clean/test5.svg" /></p>
+<h3 id="qualité-du-svg.">Qualité du SVG.</h3>
+<p>Avec Potrace la nœud &quot;path&quot; est enfant d’une balise &quot;g&quot; avec une grosse transformation. Les coordonnées des points du path sont arrondies après la virgules ! Avec inkscape aussi les tracés sont &quot;optimisés&quot; (mélange de coordonnées relatives et absolues). Pour les passer en absolues :</p>
+<blockquote>
+<p>'Edit&gt; preferences &gt; SVG Output &gt; Path Data' to always use absolute coordinates (i.e. do not allow relative coordinates). This will only affect newly created paths, or existing objects for which a rewrite of the path data is triggered. For existing paths, use 'Edit &gt; Select All in All Layers', and nudge the selection with the arrow keys (e.g. one step up and one back down again). This will trigger a rewrite of the path data in 'd' which will follow the changed preferences for optimized path data. resave.</p>
+</blockquote>
+<h3 id="visionner-les-tracés">Visionner les tracés :</h3>
+<p>Visionneuse de tracés, points et poignées : <em><a href="vectors/index.html">/Glyphes/vectors/index.html</a></em></p>
+<p><em>(to do: corriger le décalage entre les handles d’un point à un autre/OK-25-01-17/ mais il reste des problèmes pour les derniers points, après un segClosePath)</em></p>
+<h3 id="simplification">Simplification :</h3>
+<p><strong>pour le moment la simplification des tracés n’est pas implémentée dans un script</strong></p>
+<p>simplification réalisée avec inkscape :</p>
+<p><img src="Glyphs/a30-vectInk-simp0-viz.svg" alt="0 simplification" /><img src="Glyphs/a30-vectInk-simp1-viz.svg" alt="1 simplification" /><img src="Glyphs/a30-vectInk-simp2-viz.svg" alt="2 simplifications" /><img src="Glyphs/a30-vectInk-simp8-viz.svg" alt="8 simplifications" /><img src="Glyphs/a30-vectInk-simp17-viz.svg" alt="17 simplifications" /><img src="Glyphs/a30-vectInk-simp24-viz.svg" alt="24 simplifications" /></p>
+<p><em>(to do : faire un script qui simplifie et sauvegarde le tracé une 30ene de fois et qui génère le html pour la visionneuse.)</em></p>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
+<h3 id="script-vectorize.py">Script <code>vectorize.py</code></h3>
+<pre>
+<code>python3.5 Toolbox/vectorize.py [-c CONFIGFILE] [-t TARGET [TARGET ...]] [-o OUTPUT] [--pnm PNM] [-s SIMPLE] [--html] [-l LEVEL]</code>
+# exemple
+<code>python3.5 Toolbox/vectorize.py -t Glyphes/levels/a30pc10d.png -o Glyphes/vectors/</code>
+</pre>
+<ul>
+<li>convertit en ppm et les enregistre dans Glyphes/clean</li>
+<li>vectorise dans {outputFolder}</li>
+<li>simplifie sous la forme <code>{char}{level}-simpl{nb simplification}.svg</code></li>
+<li>crée un fichier html pour afficher les tracés et leurs poignées</li>
+</ul>
+<h1 id="métriques">Métriques :</h1>
+<h2 id="extraction-depuis-lhocr">extraction depuis l’HOCR</h2>
+<p>On peut essayer de générer les métriques de notre police de caractère de la même manière que nous avons fait pour les contours : en faisant la moyenne de tout les résultats individuels récupéré par <em>Tesseract</em> dans les fichiers <em>hOCR</em>. Plusieurs éléments peuvent nous intéresser :</p>
+<ul>
+<li><code>x_size</code></li>
+<li><code>baseline_angle</code></li>
+<li><code>baseline_offset</code></li>
+<li><code>x_descenders</code></li>
+<li><code>x_assenders</code></li>
+</ul>
+<figure>
+<img src="http://kba.cloud/hocr-spec/images/baseline.png" />
+</figure>
+<ul>
+<li>La taille de l’<em>espace</em> devrait être la distance entre les mots. (<code>ocrx_word</code>)</li>
+<li>Le <em>crenage</em> peut aussi être déduit de la position et de la taille des glyphs (<code>ocrx_cinfo</code>) deux à deux.</li>
+</ul>
+<h3 id="script-extract-metrics.py">script <code>extract-metrics.py</code></h3>
+<p>Ce script va justement extraire toutes ces information des <em>hOCR</em>, en faire la moyenne et les enregistrer dans le fichier <code>Font/metrics.json</code>.</p>
+<pre>
+<code>python3.5 extract-metrics.py [-c CONFIGFILE] [-H HOCR [HOCR ...]] [-i IMAGE [IMAGE ...]] [-m METRICS] [--capheight CAPHEIGHT]</code>
+#exemple
+<code>python3.5 extract-metrics.py -h Layout/hocr-charboxes -i Page/ --capheight 80</code>
+</pre>
+<h2 id="les-metrics-dans-fontforge">Les metrics dans FontForge</h2>
+<ul>
+<li><p>puisque le cadratin est égale à 1000, la chasse de base l’est aussi. Les approches correspondent aussi à la position du tracé dans le fichier SVG source.</p></li>
+<li><p>dans FontForge on peut faire des métriques automatiques (autoWidth) à partir de valeurs (separation, min, max). Est-ce qu’il ne faut pas plûtot utiliser les valeurs sorties en hOCR ?</p></li>
+<li><p>ce type de données sont formatées dans des fichiers comme <code>AFM</code> (Adobe Font Metrics) regroupant les réglages par groupe de caractère ou pour chaques paires de caractères.(<em>Crénage</em> ou <em>Kerning</em>)</p></li>
+<li><p>on peut importer ces paramètres dans fontforge avec <code>mergeFeatures</code> (et/ou LookUp ?) ou les rentrer avec <code>addPosSub</code></p></li>
+<li><p>on peut faire le crenage dans inkscape mais comment les importer dans FontForge ?</p></li>
+</ul>
+<h1 id="import-des-contours">Import des contours</h1>
+<h2 id="font-svg-avec-inkscape">Font SVG avec inkscape :</h2>
+<h3 id="structure-dune-fonte-svg"> structure d’une fonte SVG :</h3>
+<div class="preblack">
+<pre><code>...
+  &lt;font
+         horiz-adv-x=&quot;1024&quot;
+         id=&quot;font74&quot;
+         inkscape:label=&quot;fonte 1&quot;&gt;
+        &lt;font-face
+           units-per-em=&quot;1024&quot;
+           id=&quot;font-face76&quot;
+           font-family=&quot;SVGFont 1&quot; /&gt;
+        &lt;missing-glyph
+           d=&quot;M0,0h1000v1024h-1000z&quot;
+           id=&quot;missing-glyph78&quot; /&gt;
+        &lt;glyph
+           glyph-name=&quot;glyphe 1&quot;
+           id=&quot;glyph80&quot;
+           unicode=&quot;a&quot;
+           d=&quot;M ...&quot;
+           /&gt;
+        ...
+  &lt;/font&gt;
+...
+</code></pre>
+</div>
+<p><em>X-path</em> avec <em>xml.etree</em> :</p>
+<p><code>svg.findall('./{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}namedview/{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}guide')</code> #trouve les guides</p>
+<p><code>svg.find('.//{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}guide[@</code> <code>{http://www.inkscape.org/namespaces/inkscape}</code> <code>label=&quot;baseline&quot;]')</code> #trouve le guide qui a comme nom baseline</p>
+<h3 id="en-graphique">en graphique :</h3>
+<ul>
+<li><p>créer un document de type &quot;<em>canevas typographique</em>&quot; <code>Glyphes/font.svg</code></p></li>
+<li><p>importer chaque glyphes (<code>Glyphes/vectors/*.svg</code>)</p></li>
+<li><p>/!\ une matix se crée à l’import (de type matrix(1.3333333,0,0,1.3333333,277.26123,389.97951) ) et en copiant le tracé de la glyphe depuis inkscape vers le canevas typographique)*</p></li>
+<li><p>appliquer les transformations aux tracés (et non au groupe qui l’entoure) <code>extension</code> -&gt; <code>Modifier le chemin</code> -&gt; <code>Apply Transform</code></p></li>
+<li><p>placer le tracé dans un calque typographique <code>extension</code> -&gt; <code>Typographie</code> -&gt; <code>Ajouter un calque de glyphe...</code></p></li>
+<li><p>une fois chaque glyphe dans un calque typographique, l’extension va générer la font SVG automatiquement avec : <code>extension</code> -&gt; <code>Typographie</code> -&gt; <code>convertir les calques de glyphes en police SVG</code></p></li>
+</ul>
+<div style="page-break-after: always;">
+
+</div>
+<h3 id="en-script">en script :</h3>
+<code>importSVGinSVGFont.py</code> pour faire tout ça.
+<pre>
+  <code>python3.5 Toolbox/importSVGinSVGFont.py {vectorFiles} > {outputFile}</code>
+  <code>python3.5 Toolbox/importSVGinSVGFont.py Glyphes/vectors2/\*30pc10d.svg > Font/font.svg</code>
+  </pre>
+<h3 id="script">script</h3>
+<p>l’extension <code>adjustSVG2Font</code> permet de placer et redimensionner les glyphes par rapport à la grille de la typo SVG</p>
+<ul>
+<li>on récupère les glyphes et leur BBOX avec svgpathtools. -&gt; (x0,y0,x1,y1) a = (253.8495, 649.43808, 271.0452283962141, 753.5576795047747) <em>(pozXobj=Gauche,maxXobj=Droit,EM-maxZobj=haut,EM-pozYobj=bas)</em></li>
+</ul>
+<p>Chaque caractère va venir se placer à un endroit spécifique du canvas. Certain contours se poserons sur la <em>baseline</em>, d’autre en dessous de la <em>capheight</em> etc.</p>
+<figure>
+<img src="Font/svgfont.png" />
+</figure>
+<div style="page-break-after: always;">
+
+</div>
+<h1 id="font-svg-to-fontforge">Font SVG to FontForge :</h1>
+<h3 id="bonnes-pratiques">Bonnes pratiques :</h3>
+<p>extrait de <a href="http://designwithfontforge.com/en-US/Importing_Glyphs_from_Other_Programs.html">DesignWithFontForge</a> :</p>
+<ul>
+<li><p>garder la taille du cadratin à 1000 (donc 1000px dans la svgfont)</p></li>
+<li><p>configurer la baseline dans &quot;Element &gt; Font Info &gt; General&quot; :</p></li>
+<li><p>desendante fontforge = <em>y</em> baseline inkscape</p></li>
+<li><p>assendante fontforge = 1000 - <em>y</em></p></li>
+<li><p>chaque attribut <em>d</em> des <em>path</em> doit terminer par un &quot;<em>Z</em>&quot; pour que les normales (intérieur/extérieur soit bonnes dans FontForge)</p></li>
+</ul>
+<h2 id="python-fontforge">python-fontforge :</h2>
+<p>la lib fontforge pour python : <a href="dmtr.org/ff.php">ref ici</a></p>
+<p><em>ne fonction qu’avec python 2.7</em></p>
+<p>petit guide rapide :</p>
+<ul>
+<li><code>font = fontforge.open(&quot;Font/font.sfd&quot;)</code> # ouvre un fichier fontforge depuis python</li>
+<li><code>newGlyph = font.createMappedChar(&quot;a&quot;)</code> # crée un caractère</li>
+<li>système de &quot;selection&quot; comme sur l’interface pour faire une action sur plusieurs glyphes (comme autoWidth) : <code>font.selection.all()</code> puis <code>font.autoWidth(200)</code></li>
+<li><code>font.save(newfont.sfd)</code></li>
+</ul>
+<h3 id="script-1">script</h3>
+<p>Le script <code>svgfont2fontforge</code> permet d’importer une <em>fontsvg</em> dans <em>FontForge</em>. Il exporte chaque calque en un fichier <em>SVG</em> puis les importe pour le caractère correspondant dans FontForge.</p>
+</body>
+</html>
