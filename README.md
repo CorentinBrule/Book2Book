@@ -1,6 +1,5 @@
-<div>
-<img id="background" src="background.svg.png" style="display:none"></img>
-</div>
+<div id="background" style="display:none"></div>
+![flowchart](Flowchart-print.svg)
 # Book2Book
 
 est un ensemble d’outils pour produire *une mise en page à partir d’un spécimen*. À partir d’un livre numérisé, l’objectif est d’extraire, de conserver et de réutiliser tous les éléments permettant sa *re-production*.
@@ -93,10 +92,3 @@ Cette démarche est complémentaire aux deux autres. Le traitement formels est b
 La démarche d'ouverture de ce projet est surtout une tentative de ré-intégration des outils mathématiques et scientifique dans une pratique de création de forme.
 
 [HOCR]: <https://en.wikipedia.org/wiki/HOCR>
-
-### étapes intermédiaire
-
-```
-LC_COLLATE=C ls|grep png > file.txt
-convert -delay 50 -quality 95 `cat file.txt` -gravity center -fill White -extent 1000x1000 level.mpg
-```

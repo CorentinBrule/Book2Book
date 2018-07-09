@@ -98,11 +98,11 @@ blockquote p{
 
   }
   .margin{
-
     margin: 0;
     height: 1cm;
   }
   #background{
+    display: block!important;
     /*background: repeating-linear-gradient(-45deg,white , white 10px, grey 10px, grey 15px);*/
     background-image:url("background.svg.png");
     /*background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzInLz4KPC9zdmc+") ;*/
@@ -120,9 +120,9 @@ blockquote p{
 
   body {
     height: 297mm;
-    width: 40%;
+    width: 41%;
     /*margin-right: 2cm;*/
-    padding-left: 2cm;
+    padding-left: 1.8cm;
     margin-top: 0;
     /*position: absolute;
     right: 0;*/
@@ -131,10 +131,9 @@ blockquote p{
     margin-bottom: 1.5cm;*/
     margin-left: 50%;
     font-family: serif;
-    font-size: 12pt;
+    font-size: 13pt;
     background-color: #fff!important;
     color: #000!important;
-    font-size: 14pt;
   }
   em{
     color:white;
@@ -146,9 +145,9 @@ blockquote p{
   }
   h1 {
     /*text-align: center;*/
-    font-size: 50pt;
+    font-size: 48pt;
     margin-top: 1cm;
-    margin-left: -270mm;
+    margin-left: -250mm;
     margin-bottom: -2mm;
     padding: 1mm;
     background-color: white;
@@ -158,17 +157,17 @@ blockquote p{
   }
 
   h2 {
-    font-size:35pt;
-    margin-bottom: -1mm;
-    margin-top: -1mm;
-    margin-left: -250mm;
+    font-size:33pt;
+    margin-bottom: -2mm;
+    margin-top: -2.5mm;
+    margin-left: -225mm;
     background-color: white;
     display: table;
     padding: 1mm;
   }
 
   h3{
-    font-size: 25pt;
+    font-size: 22pt;
     margin-bottom: 0;
   }
 

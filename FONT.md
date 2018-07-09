@@ -26,6 +26,9 @@ Ce script va justement extraire toutes ces information des *hOCR*, en faire la m
 <code>python3.5 extract-metrics.py -h Layout/hocr-charboxes -i Page/ --capheight 80</code>
 </pre>
 
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
+
 ## Les metrics dans FontForge
 
 * puisque le cadratin est égale à 1000, la chasse de base l’est aussi. Les approches correspondent aussi à la position du tracé dans le fichier SVG source.
@@ -76,6 +79,9 @@ Ce script va justement extraire toutes ces information des *hOCR*, en faire la m
 
 <code>svg.find('.//{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}guide[@</code> <code>{http://www.inkscape.org/namespaces/inkscape}</code> <code>label="baseline"]')</code> #trouve le guide qui a comme nom baseline
 
+<div style="page-break-after: always;"></div>
+<div class="margin"></div>
+
 ### en graphique :
 
 * créer un document de type "*canevas typographique*" `Glyphes/font.svg`
@@ -89,8 +95,6 @@ Ce script va justement extraire toutes ces information des *hOCR*, en faire la m
 * placer le tracé dans un calque typographique `extension` -> `Typographie` -> `Ajouter un calque de glyphe...`
 
 * une fois chaque glyphe dans un calque typographique, l’extension va générer la font SVG automatiquement avec : `extension` -> `Typographie` -> `convertir les calques de glyphes en police SVG`
-
-<div style="page-break-after: always;"></div>
 
 ### en script :
 

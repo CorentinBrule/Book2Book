@@ -49,7 +49,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   <![endif]-->
 </head>
 <body>
-<div id="background">
+<div id="background" style="display:none">
 
 </div>
 <h1 id="book2book">Book2Book</h1>
@@ -136,9 +136,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </figure>
 <p>Cette démarche est complémentaire aux deux autres. Le traitement formels est basique et ignore les spécificités technique et historique des spécimens, proposant une arpoche plus photographique que typographique. Toutes les caractéristiques du fac-similé sont intégrées dans la création des nouvelles formes (les défaut d'impression, de conservation, de numérisation), ne cherchant pas à créer un <em>idéal numérique</em> d'un document historique mais un outil de <em>re-production numérique</em>.</p>
 <p>La démarche d'ouverture de ce projet est surtout une tentative de ré-intégration des outils mathématiques et scientifique dans une pratique de création de forme.</p>
-<h3 id="étapes-intermédiaire"> étapes intermédiaire</h3>
-<pre><code>LC_COLLATE=C ls|grep png &gt; file.txt
-convert -delay 50 -quality 95 `cat file.txt` -gravity center -fill White -extent 1000x1000 level.mpg</code></pre>
 <div style="page-break-after: always;">
 
 </div>
@@ -517,6 +514,12 @@ avec Inkscape en mode GUI ou ligne de commande, ou directement avec <a href="htt
 #exemple
 <code>python3.5 extract-metrics.py -h Layout/hocr-charboxes -i Page/ --capheight 80</code>
 </pre>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
 <h2 id="les-metrics-dans-fontforge">Les metrics dans FontForge</h2>
 <ul>
 <li><p>puisque le cadratin est égale à 1000, la chasse de base l’est aussi. Les approches correspondent aussi à la position du tracé dans le fichier SVG source.</p></li>
@@ -555,6 +558,12 @@ avec Inkscape en mode GUI ou ligne de commande, ou directement avec <a href="htt
 <p><em>X-path</em> avec <em>xml.etree</em> :</p>
 <p><code>svg.findall('./{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}namedview/{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}guide')</code> #trouve les guides</p>
 <p><code>svg.find('.//{http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd}guide[@</code> <code>{http://www.inkscape.org/namespaces/inkscape}</code> <code>label=&quot;baseline&quot;]')</code> #trouve le guide qui a comme nom baseline</p>
+<div style="page-break-after: always;">
+
+</div>
+<div class="margin">
+
+</div>
 <h3 id="en-graphique">en graphique :</h3>
 <ul>
 <li><p>créer un document de type &quot;<em>canevas typographique</em>&quot; <code>Glyphes/font.svg</code></p></li>
@@ -564,9 +573,6 @@ avec Inkscape en mode GUI ou ligne de commande, ou directement avec <a href="htt
 <li><p>placer le tracé dans un calque typographique <code>extension</code> -&gt; <code>Typographie</code> -&gt; <code>Ajouter un calque de glyphe...</code></p></li>
 <li><p>une fois chaque glyphe dans un calque typographique, l’extension va générer la font SVG automatiquement avec : <code>extension</code> -&gt; <code>Typographie</code> -&gt; <code>convertir les calques de glyphes en police SVG</code></p></li>
 </ul>
-<div style="page-break-after: always;">
-
-</div>
 <h3 id="en-script">en script :</h3>
 <code>importSVGinSVGFont.py</code> pour faire tout ça.
 <pre>
