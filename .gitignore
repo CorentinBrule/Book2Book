@@ -5,6 +5,7 @@ Toolbox/*.pyc
 Toolbox/__pycache__/
 Toolbox/bookscanner/cache/
 Toolbox/bookscanner/__pycache__/
+Toolbox/venv*
 
 # Book folder
 Book/*
