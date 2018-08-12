@@ -1,5 +1,7 @@
 <div id="background" style="display:none"></div>
+
 ![flowchart](Flowchart-print.svg)
+
 # Book2Book
 
 est un ensemble d’outils pour produire *une mise en page à partir d’un spécimen*. À partir d’un livre numérisé, l’objectif est d’extraire, de conserver et de réutiliser tous les éléments permettant sa *re-production*.
@@ -24,6 +26,7 @@ est un ensemble d’outils pour produire *une mise en page à partir d’un spé
 8. Configurer les métriques et diacritiques des fontes
 
 ## Architecture des projets:
+
 <pre class="preblack">
 .
 ├── config.yaml
@@ -43,12 +46,15 @@ est un ensemble d’outils pour produire *une mise en page à partir d’un spé
     ├── BookScanner
     ├── extensionInkscape
     └── WebViewer
-</pre class="preblack">
+    
+</pre>
 
 Ceci est une proposition de nomenclature qui peut être changée dans le fichier de configuration `config.yaml`.
 
 <div style="page-break-before: always; margin-bottom:1cm;"></div>
+
 <div class="margin"></div>
+
 
 ## Comment fonctionne cette documentation ?
 
@@ -71,10 +77,15 @@ pandoc -s -c README.css -f markdown -t html5 README.md BOOK.md LAYOUT.md GLYPHS.
 * textuelles (le contenu)
 * sémantique (la structure du document)
 * graphique (la mise en page et la caractérisation des éléments graphiques)
+
 <div style="height:80%;">
+ 
 ![Image du projet http://www.europeana-newspapers.eu/](Layout/olr.jpg)
+
 </div>
+
 <div style="page-break-after: always;"></div>
+
 <div class="margin"></div>
 
 ## Imitation typographique
@@ -89,6 +100,6 @@ Parameter Extraction from Historical Documents](Re-Typograph.jpg)
 
 Cette démarche est complémentaire aux deux autres. Le traitement formels est basique et ignore les spécificités technique et historique des spécimens, proposant une arpoche plus photographique que typographique. Toutes les caractéristiques du fac-similé sont intégrées dans la création des nouvelles formes (les défaut d'impression, de conservation, de numérisation), ne cherchant pas à créer un *idéal numérique* d'un document historique mais un outil de *re-production numérique*.
 
-La démarche d'ouverture de ce projet est surtout une tentative de ré-intégration des outils mathématiques et scientifique dans une pratique de création de forme.
+La démarche d'ouverture de ce projet est surtout une tentative de ré-intégration des outils mathématiques et scientifiques dans une pratique de création de forme.
 
 [HOCR]: <https://en.wikipedia.org/wiki/HOCR>
