@@ -1,8 +1,8 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3
 # coding: utf8
 
 import os, subprocess, re
-from ProgressBar import *
+from lib.ProgressBar import *
 import argparse
 import yaml
 
@@ -18,7 +18,7 @@ outputFolder = ""
 
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
-        configdata = yaml.load(configfile)
+        configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         targetFolders = [configdata['sortedGlyphImageFolder'] + f for f in
                          os.listdir(configdata['sortedGlyphImageFolder']) if
                          os.path.isdir(configdata['sortedGlyphImageFolder'] + f)]

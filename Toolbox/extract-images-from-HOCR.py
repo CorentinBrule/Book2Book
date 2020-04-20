@@ -1,10 +1,10 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3
 # coding: utf8
 
 import os, subprocess, re
 import argparse
 import yaml
-from ProgressBar import *
+from lib.ProgressBar import *
 
 from PIL import Image
 from bs4 import BeautifulSoup
@@ -28,10 +28,10 @@ margin = 0
 # get data from config file
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
-        configdata = yaml.load(configfile)
+        configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         outputFolder = configdata['extractedGlyphImageFolder']
         hocrSources = [configdata['hocrFolder'] + f for f in os.listdir(configdata['hocrFolder']) if re.search(r"hocr|html",f)]
-        imageSources = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder']) if re.search(r"png|jpg|tiff", f)]
+        imageSources = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder']) if re.search(r"png|jpg|tiff|PNG|JPEG|JPG|jpeg", f)]
         margin = configdata['hocrMarginPixel']
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
@@ -51,7 +51,7 @@ if outputFolder[-1] != "/":
     outputFolder += "/"
 subprocess.call(["mkdir", "-p", outputFolder])
 
-print(len(hocrSources),len(imageSources))
+#print(len(hocrSources),len(imageSources))
 #inputs sorted and matched
 globalGlyphCount = 0
 HOCRs = {}
@@ -122,4 +122,4 @@ if len(hocrSources) == len(imageSources):
             print("impossible to extract images from {}".format(pageNumber))
 
 else:
-    print("PAGE files and page image don't match")
+    print("HOCR files ({}) and page images ({}) don't match".format(len(hocrSources),len(imageSources)))

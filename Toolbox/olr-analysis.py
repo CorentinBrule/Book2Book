@@ -1,10 +1,10 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3
 # coding: utf8
 
 import os, subprocess, re
 import argparse
 import yaml
-from ProgressBar import *
+from lib.ProgressBar import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--configfile", default="config.yaml")
@@ -20,7 +20,7 @@ lang = ""
 # get data from config file
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
-        configdata = yaml.load(configfile)
+        configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         outputFolder = configdata['hocrFolder']
         images2analysis = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder'])]
 
@@ -44,11 +44,10 @@ if len(images2analysis) > 0:
     progressBar = ProgressBar(len(images2analysis), 30, "Analysis : ")
     for img in images2analysis:
 
-        if os.path.isfile(img) and re.search(r"\.png|\.PNG|\.jpg|\.jpeg|\.JPG", img):
+        if os.path.isfile(img) and re.search(r"\.png|\.PNG|\.jpg|\.jpeg|\.JPG|\.JPEG", img):
             outputName = img.split("/")[-1].split(".")[0:-1]
             subprocess.call(
-                ["tesseract", str(img), "-l", lang, "-c", "tessedit_create_hocr=1", "-c", "hocr_char_boxes=1",
-                 str(outputFolder) + str(outputName[0])])
+                ["tesseract", str(img), str(outputFolder) + str(outputName[0]), "-l", lang, "-c", "tessedit_create_hocr=1", "-c", "hocr_char_boxes=1"])
         else:
             print(" ----> invalid file found : {}".format(img))
         progressBar.update()

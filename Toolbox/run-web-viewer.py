@@ -56,4 +56,4 @@ with open(webViewerFolder + "config.json", "w") as configFile:
 
 print("config.json file edited from the YAML config file of the project")
 
-subprocess.call(["python3.5", "-m", "http.server", str(port)])
+subprocess.call(["python3", "-m", "http.server", str(port)])

@@ -2,7 +2,7 @@
 # coding: utf8
 
 import sys, os, subprocess, re
-from ProgressBar import *
+from lib.ProgressBar import *
 import argparse
 import yaml
 from bs4 import BeautifulSoup

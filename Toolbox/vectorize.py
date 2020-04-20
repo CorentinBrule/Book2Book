@@ -1,8 +1,8 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3
 # coding: utf8
 
 import os, sys, subprocess, re
-from ProgressBar import *
+from lib.ProgressBar import *
 import argparse
 import yaml
 
@@ -25,7 +25,7 @@ ifHTML = False
 
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
-        configdata = yaml.load(configfile)
+        configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         images = [configdata['levelsFolder'] + i for i in os.listdir(configdata['levelsFolder'])]
         outputFolder = configdata['vectorsFolder']
         pnmFolder = configdata['pnmFolder']
@@ -60,7 +60,7 @@ for i in images:
     iName = i.split("/")[-1].split(".")[-2]
     subprocess.call(["convert", i, pnmFolder + iName + ".pnm"])
     subprocess.call(["potrace", pnmFolder + iName + ".pnm", "-s", "-o", outputFolder + iName + ".svg"])
-    clearSvg = subprocess.check_output(["python", "Toolbox/applytransform.py", outputFolder + iName + ".svg"])
+    clearSvg = subprocess.check_output(["Toolbox/venv2/bin/python2.7", "Toolbox/extensionInkscape/applytransform.py", outputFolder + iName + ".svg"])
     # print(clearSvg.decode("utf-8"))
     with open(outputFolder + iName + ".svg", 'wb') as f:
         clearSvg = re.sub(r'"/>', 'Z"/>', clearSvg.decode("utf-8"))

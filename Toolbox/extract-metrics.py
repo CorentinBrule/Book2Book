@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3
 # coding=utf-8
 
 # to do : rajouter ProgressBar
@@ -7,7 +7,7 @@ import os, sys, re, subprocess
 from bs4 import BeautifulSoup
 from PIL import Image
 import extracthocr
-from ProgressBar import *
+from lib.ProgressBar import *
 import argparse
 import yaml
 import json
@@ -34,8 +34,7 @@ cadratin = 0
 # get data from config file
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
-    #with open(args.configfile, "r") as configfile:
-        configdata = yaml.load(configfile)
+        configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         # outputFolder = configdata['extractedGlyphImageFolder']
         hocrSources = [configdata['hocrFolder'] + f for f in os.listdir(configdata['hocrFolder']) if
                        re.search(r"hocr|html", f)]
@@ -81,8 +80,8 @@ def bruteforce(charset, maxlength, minlength=1):
 def extract_with_2_nodes(node0, node1, pageImg):
     coords0 = extracthocr.getTitleAttribute(node0, "bbox")
     coords1 = extracthocr.getTitleAttribute(node1, "bbox")
-    print(coords0, coords1)
-    print(coords1[0] - coords0[2])
+    #print(coords0, coords1)
+    #print(coords1[0] - coords0[2])
     # xs = sorted([coords0[0], coords0[2], coords1[0], coords1[2]])
     # ys = sorted([coords0[1], coords0[3], coords1[1], coords1[3]])
     # print(xs, ys)
@@ -122,7 +121,7 @@ def get_all_metrics(HOCRs):
     kerning = {}
     for pageNumber, hocrDoc in HOCRs.items():
         body = hocrDoc.body
-        print(pageNumber,hocrDoc)
+        #print(pageNumber,hocrDoc)
         for page in body.findAll(attrs={"class": "ocr_page"}):
             for area in page.findAll(attrs={"class": "ocr_carea"}):
                 for para in area.findAll(attrs={"class": "ocr_par"}):
@@ -150,7 +149,7 @@ def get_all_metrics(HOCRs):
                                     kerning.setdefault(il[0], {})
                                     kerning[il[0]].setdefault(il[1], []).append(kern) # kerns
                                     # print(kern)
-                                    print(letter)
+                                    #print(letter)
 
 
     metrics["kerning"] = kerning
@@ -184,7 +183,7 @@ for f in hocrSources:
     # get page number and match it with it HOCR file parsed in a dictionnary : HOCRs[<page>] = <page>.hocr
     pageHOCR = re.findall('\d+', f.split('/')[-1])[0]
     with open(f, "rb") as fp:
-        HOCRs[pageHOCR] = BeautifulSoup(fp)
+        HOCRs[pageHOCR] = BeautifulSoup(fp,features="lxml")
 
 for i in imageSources:
     # get page number and match it with it .png file parsed by PIL in a dictionnary : Imgs[<page>] = <page>.png
@@ -193,18 +192,21 @@ for i in imageSources:
 
 
 metrics = get_all_metrics(HOCRs)
-print(metrics)
+#print(metrics)
 
 averaged = average_metrics(metrics)
 
+'''
 if capHeight > 0:
     #print(capHeight)
 
-    originalSize = capHeight + averaged["x_descenders"]
+    #originalSize = capHeight + averaged["x_descenders"]
     #print(originalSize)
     averaged["mult_to_cadratin"] = get_multToCadratin(originalSize, cadratin)
+'''
+averaged["mult_to_cadratin"] = configdata["multToCadratin"]
 
-print(averaged)
+#print(averaged)
 
 with open(metricsFile, 'w', encoding='utf8') as fp:
     # data = json.dumps(averaged)
@@ -230,12 +232,12 @@ for il in all_ILs:
             for i, letter in enumerate(word):
                 if letter.get_text() == il[0] and word[i + 1].get_text() == il[1]:
                     # save on dictionnary
-                    
+
                     #if il in result_letters:
                     #    result_letters[il] += [(letter,word[i+1])]
                     #else :
                     #    result_letters[il] = [(letter,word[i+1])]
-                    
+
 
                     # extract kern
                     kern = get_kern(letter, word[i + 1])

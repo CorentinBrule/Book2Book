@@ -3,7 +3,7 @@
 
 import fontforge
 import re, sys
-from ProgressBar import *
+from lib.ProgressBar import *
 import argparse
 import yaml
 import json

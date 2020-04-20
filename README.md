@@ -11,7 +11,6 @@ est un ensemble d’outils pour produire *une mise en page à partir d’un spé
   * Re-fabrication des éléments de mise en page (typographie, métriques, maquette)
   * Génération de fac-similé à partir du texte et de la mise en page extraite
 
-
   Le projet consiste en une succession de scripts *Python* qui articule différents outils *libres ou open-sources* en normalisant leurs entrées et leurs sorties dans une architecture de projet claire. La plupart des autres opérations consistent en l’automatisation de manipulations bureautiques (copié, collé, renommer) et de traitement d’image simple (faire une moyenne, un niveau...). Chaque étape est conservée pour permettre de vérifier, corriger ou détourner les différentes formes intermédiaires générées. Un fichier de configuration centralise toutes les variables nécessaires à cette chaîne d’opérations.
 
 ## Résumé des étapes de traitement:
@@ -24,6 +23,8 @@ est un ensemble d’outils pour produire *une mise en page à partir d’un spé
 6. Générer le contours moyen de chaque glyphe de chaque fonte
 7. Créer les fontes et y importer les contours des glyphes
 8. Configurer les métriques et diacritiques des fontes
+9. Générer les sources de mise en page des documents reproduis
+10. Compiler les sources pour obtenir un document présenté par pages
 
 ## Architecture des projets:
 
@@ -46,7 +47,7 @@ est un ensemble d’outils pour produire *une mise en page à partir d’un spé
     ├── BookScanner
     ├── extensionInkscape
     └── WebViewer
-    
+
 </pre>
 
 Ceci est une proposition de nomenclature qui peut être changée dans le fichier de configuration `config.yaml`.
@@ -55,9 +56,20 @@ Ceci est une proposition de nomenclature qui peut être changée dans le fichier
 
 <div class="margin"></div>
 
+## Testes
+
+D'abord voir `installation.md` pour l'installation des différents outils et de leurs dépendances.
+Une procédure de teste très simple permet d'exécuter une première fois l'intégralité de la chaîne de production pour vérifier l'installation des différents outils et générer les illustrations de la documentation.
+
+```
+python test.py
+```
+
+Une fois le teste passé en intégralité, pour vos documents il est conseillé de réaliser chaque script individuellement et de vérifier et corriger les étapes intermédiaires en mettant à jour les illustrations de la documentation.
 
 ## Comment fonctionne cette documentation ?
 
+* Les illustrations de la documentation sont générées au fur à mesure de l'exécution des scripts. Certaines sont des étapes nécessaires aux scripts suivants, d'autres ne servent qu'à illustrer certains principes ou simplifier des étapes de traitements manuels en visualisant des étapes intermédiaires.
 * Un diagramme basé sur les graphes de flux présente les outils principaux, leurs dépendances et leurs interactions.`LOOKME.svg`
 * Les exemples partent toujours du postulat que l’on se trouve à la racine du projet (`.`) et que l’on utilise la nomenclature par défaut.
 * Le détail de l’outil est développé dans des documents séparés `README.md` à la racine des différents dossiers pré-existants (voir Architecture des projets).
@@ -78,11 +90,8 @@ pandoc -s -c README.css -f markdown -t html5 README.md BOOK.md LAYOUT.md GLYPHS.
 * sémantique (la structure du document)
 * graphique (la mise en page et la caractérisation des éléments graphiques)
 
-<div style="height:80%;">
- 
-![Image du projet http://www.europeana-newspapers.eu/](Layout/olr.jpg)
 
-</div>
+![Image du projet http://www.europeana-newspapers.eu/](Layout/olr.jpg)
 
 <div style="page-break-after: always;"></div>
 

@@ -14,11 +14,14 @@ Pour dessiner les contours des glyphes qui composent le document, nous avons bes
 
 <div style="width:100%;">![issue135](issue135-1.png)</div>
 
-L’option `hocr_char_boxes` n’est pas disponible dans la version 3.04.01 dispo sur Debian Stretch (ni la branche master 4.00.00alpha). Il faut donc compiler un [fork de la 3.05](https://github.com/nickjwhite/tesseract/tree/hocrcharboxes) `git clone --branch hocrcharboxes https://github.com/nickjwhite/tesseract.git` [avec ce tuto](https://github.com/tesseract-ocr/tesseract/wiki/Compiling-%E2%80%93-GitInstallation). Ne pas oublier [le(s) fichier(s) de langue et d’osd](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-304305) à mettre dans `/usr/local/share/tessdata/` ou spécifier à la main avec l’option `--tessdate-dir`
+~~ L’option `hocr_char_boxes` n’est pas disponible dans la version 3.04.01 dispo sur Debian Stretch (ni la branche master 4.00.00alpha). Il faut donc compiler un [fork de la 3.05](https://github.com/nickjwhite/tesseract/tree/hocrcharboxes) `git clone --branch hocrcharboxes https://github.com/nickjwhite/tesseract.git` [avec ce tuto](https://github.com/tesseract-ocr/tesseract/wiki/Compiling-%E2%80%93-GitInstallation). Ne pas oublier [le(s) fichier(s) de langue et d’osd](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-304305) à mettre dans `/usr/local/share/tessdata/` ou spécifier à la main avec l’option `--tessdate-dir` ~~
 </div>
 ```
 git clone https://github.com/nickjwhite/tesseract.git --branch hocrcharboxes --single-branch tesseract-hocrcharboxes
 ```
+
+L’option `hocr_char_boxes` est prise en charge nativement depuis tesseract 4.1 !
+
 <div style="page-break-after: always;"></div>
 ## Analyse
 Analyses de mise en page réalisées sur les fichiers dans */Pages*.

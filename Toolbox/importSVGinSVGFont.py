@@ -1,12 +1,13 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/python3
 # coding=utf-8
 
 import sys, re, os
 # import inkex
 import xml.etree
 import xml.etree.ElementTree
-from ProgressBar import *
+from lib.ProgressBar import *
 import argparse
+import subprocess
 import yaml
 
 parser = argparse.ArgumentParser()
@@ -18,13 +19,13 @@ args = parser.parse_args()
 
 svgFontSource = ""
 svgGlyphs = ""
-outputFolder = ""
+outputFile = ""
 
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
-        configdata = yaml.load(configfile)
+        configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         svgGlyphs = [configdata['vectorsFolder'] + i for i in os.listdir(configdata['vectorsFolder'])]
-        outputFolder = configdata['svgFontFile']
+        outputFile = configdata['svgFontFile']
         svgFontSource = configdata['svgFontSourceFile']
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
@@ -32,7 +33,7 @@ except IOError:
 if args.target is not None:
     svgGlyphs = args.target
 if args.output is not None:
-    outputFolder = args.output
+    outputFile = args.output
 if args.source is not None:
     svgFontSource = args.source
 
@@ -64,6 +65,11 @@ for glyph in svgGlyphs:
     layer.append(gglyph)
     '''
 
-doc.write(outputFolder)
+doc.write(outputFile)
+
+verticalAdjustedSvg = subprocess.check_output(["Toolbox/venv2/bin/python2.7", "Toolbox/extensionInkscape/inkex-adjustSVG2Font.py", outputFile])
+
+with open(outputFile,'wb') as f:
+    f.write(verticalAdjustedSvg)
 # xml.etree.ElementTree.dump(docpython )
 #print(xml.etree.ElementTree.tostring(root, encoding="utf-8").decode("utf8"))

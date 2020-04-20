@@ -4,7 +4,7 @@
 import fontforge
 import xml.dom.minidom as minidom
 import re, sys
-from ProgressBar import *
+from lib.ProgressBar import *
 import argparse
 import yaml
 import codepoints

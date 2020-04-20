@@ -97,10 +97,18 @@ updateWithHash();
 
 // interface interactions
 
+document.addEventListener('DOMContentLoaded', function(){
+  console.log(document.querySelector("#selectPage").value);
+  loadFile(document.querySelector("#selectPage").value);
+});
+
 document.querySelector("#selectPage").addEventListener('change', function() {
     loadFile(this.value);
     console.log(this.value)
 });
+
+
+
 
 function updateTarget(){
     newTarget = document.getElementById(targetHash);
@@ -132,6 +140,7 @@ function loadFile(page) {
             functHOCR(xhttp);
         }
     };
+    console.log(config.hocrFolder + page + ".hocr");
     xhttp.open("GET", "/"+config.hocrFolder + page + ".hocr", true);
     xhttp.send();
 }
@@ -283,7 +292,7 @@ function functHOCR(xhttp) {
 
     imgpath = "/" + getTitleAttribute(firstPage,"image");
     firstPage.style.backgroundImage = "url("+imgpath+")"
-
+    console.log(imgpath);
     layoutdiv = document.querySelector('.hocr-viewer');
     layoutdiv.innerHTML = firstPage.parentNode.innerHTML;
 
