@@ -4,9 +4,8 @@
 import fontforge
 import xml.dom.minidom as minidom
 import re, sys
-from lib.ProgressBar import *
 import argparse
-import yaml
+import yaml, json
 import codepoints
 import subprocess
 
@@ -20,14 +19,17 @@ args = parser.parse_args()
 svgFile = ""
 fontFile = ""
 individualGlyphFolder = ""
+metricsFile = ""
 
-
+marginValue = 0
 try:
     with open(args.configfile, "r") as configfile:
         configdata = yaml.load(configfile)
         svgFile = configdata['svgFontFile']
         fontFile = configdata['fontSourceFile']
         individualGlyphFolder = configdata['individualGlyphFolder']
+        metricsFile = configdata['metricsFile']
+        marginValue = configdata['hocrMarginPixel']
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
 
@@ -39,6 +41,14 @@ if args.individualGlyphFolder is not None:
     individualGlyphFolder = args.individualGlyphFolder
 
 subprocess.call(["mkdir", "-p", individualGlyphFolder])
+
+marginRescaledValue = 0
+try:
+    with open(metricsFile, "r") as mf:
+        mectrics = json.load(mf)
+        marginRescaledValue = float(marginValue) * float(mectrics['mult_to_cadratin'])
+except IOError:
+    print("Metrics file 'metrics.json' or 'mult_to_cadratin' value not found !")
 
 font = fontforge.font()
 # glypha = font.createMappedChar('a')
@@ -65,11 +75,15 @@ svglyphlayers = [g for g in svgDom.getElementsByTagName('g') if
 
 print(svglyphlayers[0].getAttribute("inkscape:label"))
 
-for l in svglyphlayers:
-    name = l.getAttribute("inkscape:label")
+for layer in svglyphlayers:
+    name = layer.getAttribute("inkscape:label")
     strglyph = re.findall(r'GlyphLayer-(.*)', name)[0].encode('utf-8')
     print(name)
     print(strglyph.decode('utf-8'))
+    print(layer.toxml("utf-8"))
+    print(layer.getAttribute("width")[0:-2])
+    gwidth = float(layer.getAttribute("width")[0:-2])
+
     #try:
     ''' pour faire les combinés pour l'assemblage des diacritiques
     if strglyph == "à" or strglyph == "ù":
@@ -98,18 +112,25 @@ for l in svglyphlayers:
     fontglyph = font.createChar(uniCodePoint)
     tmpsvg = minidom.parseString(svgModel)
     #print(tmpsvg.toxml())
-    tmpsvg.getElementsByTagName("svg")[0].appendChild(l)
+    tmpsvg.getElementsByTagName("svg")[0].appendChild(layer)
     pathtmpsvg = individualGlyphFolder + glyphName + ".svg"
     with open(pathtmpsvg, 'w') as f:
         f.write(tmpsvg.toxml("utf-8"))
 
     fontglyph.importOutlines(pathtmpsvg)
+
+    fontglyph.width = gwidth
+
+    # correct the margin present since the extraction of the images.
+    fontglyph.left_side_bearing = fontglyph.left_side_bearing-marginRescaledValue
+    fontglyph.right_side_bearing = fontglyph.right_side_bearing-marginRescaledValue
+
     #except ValueError as e:
     #    print("glyph name error")
 
 space = font.createMappedChar(" ")
 
-font.selection.all()
-font.autoWidth(200)
+# font.selection.all()
+# font.autoWidth(200)
 
 font.save(fontFile)

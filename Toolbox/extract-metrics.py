@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-# to do : rajouter ProgressBar
-
 import os, sys, re, subprocess
 from bs4 import BeautifulSoup
 from PIL import Image
@@ -12,20 +10,18 @@ import argparse
 import yaml
 import json
 
-
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--configfile", default="config.yaml")
 parser.add_argument("-H", "--hocr", help="hocr(s) with layout data", nargs='+')
 parser.add_argument("-i", "--image", help="image(s) of page", nargs='+')
-# parser.add_argument("-o", "--output", help="folder to save extracted images")
+parser.add_argument("--outputpair", help="folder to save the extracted images of pairs of letters ")
 parser.add_argument("-m", "--metrics", help="json file to output metrics")
 parser.add_argument("--capheight",help="define max letterheight to add multToCadratin to metrics")
 args = parser.parse_args()
 
 hocrSources = ""
 imageSources = ""
-# outputFolder = ""
+outputPairFolder = ""
 metricsFile = ""
 margin = 0
 capHeight = 0
@@ -58,6 +54,9 @@ if args.metrics is not None:
     metricsFile = args.metrics
 if args.capheight is not None:
     capHeight = int(args.capheight)
+if args.outputpair is not None:
+    outputPairFolder = args.outputpair
+
 
 # alphabet = "abcdefghijklmnopqrstuvwxyzABCEDFGHIJKLMNOPQRSTUVWXYZ"  # aller plutot les chercher dans la font # ça ne sert à rien de rechercher Min+Maj (ex: eA), les majs doivent être traitées autrement
 capAlphabet ="ABCDEFGHIJKLMNOP"
@@ -80,15 +79,14 @@ def bruteforce(charset, maxlength, minlength=1):
 def extract_with_2_nodes(node0, node1, pageImg):
     coords0 = extracthocr.getTitleAttribute(node0, "bbox")
     coords1 = extracthocr.getTitleAttribute(node1, "bbox")
-    #print(coords0, coords1)
-    #print(coords1[0] - coords0[2])
-    # xs = sorted([coords0[0], coords0[2], coords1[0], coords1[2]])
-    # ys = sorted([coords0[1], coords0[3], coords1[1], coords1[3]])
-    # print(xs, ys)
-    # coordCrop = [xs[0], ys[0], xs[-1], ys[-1]]
-    # area = pageImg.crop(coordCrop)
-    # return area
-    return ""
+    print(coords0, coords1)
+    print(coords1[0] - coords0[2])
+    xs = sorted([coords0[0], coords0[2], coords1[0], coords1[2]])
+    ys = sorted([coords0[1], coords0[3], coords1[1], coords1[3]])
+    print(xs, ys)
+    coordCrop = [xs[0], ys[0], xs[-1], ys[-1]]
+    area = pageImg.crop(coordCrop)
+    return area
 
 
 def get_kern(node0, node1):
@@ -117,12 +115,15 @@ def search_string_in_tree(body, string):
 
 # HERE ! #
 def get_all_metrics(HOCRs):
-    metrics = {" ": [], "baseline_angle": [],"baseline_offset":[], "x_size":[],"x_descenders": [], "x_ascenders": []}
+    metrics = {" ": [], "baseline_angle": [], "baseline_offset": [], "x_size": [], "x_descenders": [],
+               "x_ascenders": []}
     kerning = {}
-    for pageNumber, hocrDoc in HOCRs.items():
+    for page_number, hocrDoc in HOCRs.items():
         body = hocrDoc.body
-        #print(pageNumber,hocrDoc)
+        #print(page_number,hocrDoc)
         for page in body.findAll(attrs={"class": "ocr_page"}):
+            if args.outputpair is not None:
+                page_img = Image.open([i for i in imageSources if i.find(page_number) != -1][0])
             for area in page.findAll(attrs={"class": "ocr_carea"}):
                 for para in area.findAll(attrs={"class": "ocr_par"}):
                     for line in para.findAll(attrs={"class": "ocr_line"}):
@@ -145,12 +146,24 @@ def get_all_metrics(HOCRs):
                             for j, letter in enumerate(letters):
                                 if j > 0:
                                     kern = get_kern(letters[j-1], letters[j])
-                                    il = (letters[j-1].get_text(), letters[j].get_text())
-                                    kerning.setdefault(il[0], {})
-                                    kerning[il[0]].setdefault(il[1], []).append(kern) # kerns
+                                    pair_name = letters[j - 1].get_text() + letters[j].get_text()
+                                    kerning.setdefault(pair_name[0], {})
+                                    kerning[pair_name[0]].setdefault(pair_name[1], []).append(kern) # kerns
                                     # print(kern)
                                     #print(letter)
-
+                                    ## extract images of pairs:
+                                    if args.outputpair is not None:
+                                        area = extract_with_2_nodes(letters[j - 1], letters[j], page_img)
+                                        word_id = word.get('id')
+                                        output_name = pair_name + str(page_number) + "-" + word_id + "-" + str(
+                                            j) + ".png"
+                                        output_path = outputPairFolder + "/" + pair_name + "/"
+                                        try:
+                                            subprocess.call(["mkdir", "-p", output_path])
+                                            area.save(output_path + output_name)
+                                        except:
+                                            print(
+                                                "Can not create folder and/or save image. Maybe is a glyph name issue : " + output_path + output_name)
 
     metrics["kerning"] = kerning
     return metrics
@@ -163,7 +176,7 @@ def average_metrics(metrics):
             for glyph in kerns:
                 for pair in kerns[glyph]:
                     # print(pair+" / "+glyph)
-                    averaged["kerning"][glyph][pair] = float(sum(kerns[glyph][pair]))/len(kerns[glyph][pair])
+                    averaged["kerning"][glyph][pair] = float(sum(kerns[glyph][pair])) / len(kerns[glyph][pair])
         else :
             try:
                 averaged[m] = float(sum(metrics[m])) / len(metrics[m])
@@ -196,15 +209,14 @@ metrics = get_all_metrics(HOCRs)
 
 averaged = average_metrics(metrics)
 
-'''
 if capHeight > 0:
     #print(capHeight)
 
-    #originalSize = capHeight + averaged["x_descenders"]
+    originalSize = capHeight + averaged["x_descenders"]
     #print(originalSize)
     averaged["mult_to_cadratin"] = get_multToCadratin(originalSize, cadratin)
-'''
-averaged["mult_to_cadratin"] = configdata["multToCadratin"]
+else :
+    averaged["mult_to_cadratin"] = configdata["multToCadratin"]
 
 #print(averaged)
 
@@ -217,9 +229,9 @@ result_letters = {}
 for il in all_ILs:
     results = {}
     print(il)
-    for pageNumber, hocrDocument in HOCRs.items():  # page by page
+    for page_number, hocrDocument in HOCRs.items():  # page by page
 
-        imgPage = Imgs[pageNumber]
+        imgPage = Imgs[page_number]
         body = hocrDocument.body
 
         results_by_page = {}
@@ -246,7 +258,7 @@ for il in all_ILs:
                     result_letters[letter].setdefault(word[i + 1], []).append(kern)
                     # extract image
                     # area = extract_with_2_nodes(letter, word[i + 1], imgPage)
-                    # outputName = il + str(pageNumber) + "-" + str(i) + ".png"
+                    # outputName = il + str(page_number) + "-" + str(i) + ".png"
                     # area.save(folderOutputPath + outputName)
                     break
 
@@ -307,6 +319,6 @@ for il in all_ILs:
 for il in results_by_page.keys():
     for i,r in enumerate(results_by_page[il]):
         area = extract_with_2_nodes(r[0],r[1])
-        outputName = il + str(pageNumber) + "-" + str(i) + ".png"
+        outputName = il + str(page_number) + "-" + str(i) + ".png"
         area.save(outputFolder + outputName)
 '''

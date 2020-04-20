@@ -3,7 +3,6 @@
 
 import fontforge
 import re, sys
-from lib.ProgressBar import *
 import argparse
 import yaml
 import json
@@ -43,28 +42,44 @@ with open(metricsFile, 'r') as mf:
 
 resize = metrics["mult_to_cadratin"]
 
-# font.gpos_lookups
-font.addLookup("table", "gpos_pair", (), (("liga", (("latn", ("dflt")),)),))
-font.addLookupSubtable("table", "subtable")
-print(font.getLookupInfo("table"))
+def kerningFont(font):
+    try :
+        font.addLookup("table", "gpos_pair", (), (("liga", (("latn", ("dflt")),)),))
+    except EnvironmentError:
+        print("Lookup Table already exists")
 
-for glyph in list(font.glyphs()):
-    # charnum = fontforge.unicodeFromName
-    # print(glyph)
-    # glyph.addPosSub("subtable","f",-3)
-    # print("ok")
     try:
-        for glyphPair, rawKern in metrics["kerning"][glyph.glyphname].items():
-            kern = rawKern * resize
-            print(kern)
-            print(glyph)
-            glyphPairName = fontforge.nameFromUnicode(ord(glyphPair))
-            print(glyphPairName)
-            glyph.addPosSub("subtable", glyphPairName, int(kern)) #in fontforge, kerning value must be an integer
+        font.addLookupSubtable("table", "subtable")
+    except EnvironmentError:
+        print("Lookup Subtable already exists")
+
+    print(font.getLookupInfo("table"))
+    for glyph in list(font.glyphs()):
+        # charnum = fontforge.unicodeFromName
+        # print(glyph)
+        # glyph.addPosSub("subtable","f",-3)
+        # print("ok")
+        try:
+            for glyphPair, rawKern in metrics["kerning"][glyph.glyphname].items():
+                kern = rawKern * resize
+                print(kern)
+                print(glyph)
+                glyphPairName = fontforge.nameFromUnicode(ord(glyphPair))
+                print(glyphPairName)
+                glyph.addPosSub("subtable", glyphPairName, int(kern)) #in fontforge, kerning value must be an integer
 
 
-    except KeyError:
-        print("metrics {} are not found".format(glyph))
+        except KeyError:
+            print("metrics {} are not found".format(glyph))
+
+
+#font.gpos_lookups
+
+# space width
+spaceChar = font.createMappedChar(" ")
+spaceChar.width = float(metrics[" "])*resize
+# kerning
+kerningFont(font)
 
 font.save()
 
