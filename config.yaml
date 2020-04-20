@@ -11,34 +11,34 @@ hocrMarginPixel:  2
 
 capHeight: 0
 
-extractedGlyphImageFolder: Glyphes/auto-extracted/
+extractedGlyphImageFolder: Glyphs/auto-extracted/
 
-sortedGlyphImageFolder: Glyphes/auto-extracted/
+sortedGlyphImageFolder: Glyphs/auto-extracted/
 sortInSameFolder: 0
 
-averageFolder: Glyphes/average/
+averageFolder: Glyphs/average/
 
-levelsFolder: Glyphes/levels/
+levelsFolder: Glyphs/levels/
 levelValues:
   - 15
   - 30
   - 60
 deltaValue: 50
 
-resizedFolder: Glyphes/resized/
+resizedFolder: Glyphs/resized/
 
-pnmFolder: Glyphes/clean/
+pnmFolder: Glyphs/clean/
 
-vectorsFolder: Glyphes/vectors/
+vectorsFolder: Glyphs/vectors/
 nbSimple: 0
 ifHTML: 0
 validLevelValue: 30
 
-svgFontSourceFile: ToolboxV2/font.svg
+svgFontSourceFile: Toolbox/font.svg
 svgFontFile: Font/font.svg
 
 fontSourceFile: Font/font.sfd
-individualGlyphFolder : Font/individualGlyphs/
+individualGlyphFolder: Font/individualGlyphs/
 
 metricsFile: Font/metrics.json
 
@@ -46,4 +46,5 @@ cadratinSize: 1000
 
 webViewerFolder: Toolbox/WebViewer/
 webViewerPort: 8000
+multToCadratin: 8
 ...

@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css?family=Share+Tech');
+/*@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono');*/
+
+@font-face {
+  font-family: 'Share Tech Mono';
+  src: url('Toolbox/ShareTechMono-Regular.ttf'); /* IE9 Compat Modes */
+}
+
+h1,h2,h3{
+  font-family: Share Tech;
+  font-style: normal;
+  font-weight: normal;
+}
+
+em{
+  font-family: "Share Tech";
+  background-color: grey;
+  padding-right: 0.2rem;
+  font-weight: bold;
+}
+figcaption{
+  display: none;
+}
+
+pre code{
+  /*margin-left: 1cm;*/
+}
+pre code::before{
+  content:">> ";
+  background-color: grey;
+  /*margin-left: -1cm;*/
+}
+@media screen {
+  body {
+    margin-left: 20%;
+    margin-right: 20%;
+    font-size: 1rem;
+  }
+  pre{
+    overflow-x: scroll;
+    background-color: black;
+  }
+
+  h1 {
+    /*text-align: center;*/
+    font-size: 4rem;
+
+  }
+  h2 {
+    font-size:3rem;
+  }
+
+  h3{
+    font-size: 2rem;
+  }
+}
+
+blockquote p{
+  font-style: italic;
+}
+
+.flex-tier {
+  display: flex;
+  margin-top: 1rem;
+}
+.flex-tier img{
+  object-fit: contain;
+  width: 100%;
+}
+.flex-tier *{
+  width: 33%;
+}
+.flex-tier>img{
+  margin-top: -3cm;
+  width: 33%;
+  z-index: -1;
+}
+
+@media print {
+  html{
+    /*background: repeating-linear-gradient(-45deg,white , white 20px, black 20px, black 40px);
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100%;
+    */
+  }
+  @page{
+    size:A3 landscape;
+    margin: 0;
+    bleed:0;
+    /*margin-top: 1cm;
+    margin-left: 1cm;
+    margin-right: 1cm;
+    margin-bottom: 1.5cm;
+    */
+
+  }
+  .margin{
+    margin: 0;
+    height: 1cm;
+  }
+  #background{
+    display: block!important;
+    /*background: repeating-linear-gradient(-45deg,white , white 10px, grey 10px, grey 15px);*/
+    background-image:url("background.svg.png");
+    /*background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzInLz4KPC9zdmc+") ;*/
+    background-repeat: repeat;
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: calc(297mm * 30);
+    z-index: -1;
+    left: 0;
+    background-size: 100%;
+    -webkit-print-color-adjust:exact;
+
+  }
+
+  body {
+    height: 297mm;
+    width: 41%;
+    /*margin-right: 2cm;*/
+    padding-left: 1.8cm;
+    margin-top: 0;
+    /*position: absolute;
+    right: 0;*/
+    /*width: auto!important;*/
+    /*margin-top: 1cm;
+    margin-bottom: 1.5cm;*/
+    margin-left: 50%;
+    font-family: serif;
+    font-size: 13pt;
+    background-color: #fff!important;
+    color: #000!important;
+  }
+  em{
+    color:white;
+    padding-right: 3pt;
+    font-weight: bold;
+  }
+  pre{
+    background-color: grey;
+  }
+  h1 {
+    /*text-align: center;*/
+    font-size: 48pt;
+    margin-top: 1cm;
+    margin-left: -250mm;
+    margin-bottom: -2mm;
+    padding: 1mm;
+    background-color: white;
+    color:black;
+    page-break-before: always;
+    display: inline-block;
+  }
+
+  h2 {
+    font-size:33pt;
+    margin-bottom: -2mm;
+    margin-top: -2.5mm;
+    margin-left: -225mm;
+    background-color: white;
+    display: table;
+    padding: 1mm;
+  }
+
+  h3{
+    font-size: 22pt;
+    margin-bottom: 0;
+  }
+
+  .imgMidSize > img{
+    width: 70%;
+  }
+
+  .gifNoPrint{
+    display: none;
+  }
+}
+
+body{
+  font-family: "source sans pro"
+}
+
+pre{
+  padding: 1em;
+  /*overflow-x: scroll;*/
+}
+
+.center{
+  text-align: center;
+}
+
+
+code{
+  font-family: "Share Tech Mono";
+  background-color: black;
+  color: white;
+  white-space: pre-wrap;
+  font-variant-ligatures: none;
+}
+
+.preblack{
+  background-color:black;
+  color:white;
+  width: 150%;
+}
+.preblack code::before{
+  content:'';
+}
+.preblack code{
+  color:white;
+}
+
+
+a{
+  color:blue;
+}
+
+figure img{
+  display: flex;
+  margin: auto;
+  max-width: 100%;
+}
