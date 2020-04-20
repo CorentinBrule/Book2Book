@@ -24,7 +24,7 @@ outputFile = ""
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
         configdata = yaml.load(configfile, Loader=yaml.FullLoader)
-        svgGlyphs = [configdata['vectorsFolder'] + i for i in os.listdir(configdata['vectorsFolder'])]
+        svgGlyphs = [configdata['vectorsFolder'] + f for f in os.listdir(configdata['vectorsFolder']) if f.split(".")[-1] == "svg"]
         outputFile = configdata['svgFontFile']
         svgFontSource = configdata['svgFontSourceFile']
 except IOError:
@@ -49,12 +49,16 @@ for glyph in svgGlyphs:
     docglyph = xml.etree.ElementTree.parse(glyph)
     rootglyph = docglyph.getroot()
     gglyph = rootglyph.find('{http://www.w3.org/2000/svg}g')
+    gwidth = rootglyph.get('width')
+    gheight = rootglyph.get('height')
     gglyph.set("id", glyphname)
     # print(gglyph.tostring(encoding="utf-8"))
     # print(xml.etree.ElementTree.tostring(gglyph,encoding = "utf-8"))
     gglyph.set('inkscape:label', u'GlyphLayer-' + glyphname)
     gglyph.set('inkscape:groupmode', 'layer')
     gglyph.set('style', 'display:none')
+    gglyph.set('width',gwidth)
+    gglyph.set('height',gheight)
     root.append(gglyph)
 
     '''

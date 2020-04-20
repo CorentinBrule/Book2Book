@@ -24,9 +24,12 @@ def getTitleAttribute(hocr_element, attribute):
         return title
 
     elif attribute is 'baseline':
-        results = re.findall(r'{}\s+([+-]?([0-9]*[.])?[0-9]+)\s([+-]?\d+)'.format(attribute), title)
-        return (float(results[0][0]), float(results[0][2]))
-
+        try:
+            results = re.findall(r'{}\s+([+-]?([0-9]*[.])?[0-9]+)\s([+-]?\d+)'.format(attribute), title)
+            return (float(results[0][0]), float(results[0][2]))
+        except IndexError:
+            return(0,0)
+            
     else:
         results = re.findall(r'{}\s+([+-]?([0-9]*[.])?[0-9]+)'.format(attribute), title)
         return float(results[0][0])

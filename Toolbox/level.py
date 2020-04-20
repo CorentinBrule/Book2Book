@@ -14,7 +14,7 @@ parser.add_argument("-t", "--target", help="image(s) to be leveled.", nargs='+')
 parser.add_argument("-o", "--output", help="folder to save the leveled image(s)")
 parser.add_argument("-l", "--level", help="level value(s)", nargs='+')
 parser.add_argument("-d", "--delta", help="level delta value")
-parser.add_argument("-r", "--resize", help="mult for rescale images")
+parser.add_argument("-r", "--resize", help="mult for rescale images. If not filled, this script will try to find the 'mult_to_cadratin' value in 'matrics.json' file")
 parser.add_argument("--tmp", help="folder to save resized images")
 args = parser.parse_args()
 
