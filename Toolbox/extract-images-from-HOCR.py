@@ -23,7 +23,7 @@ hocrSources = ""
 imageSources = ""
 outputFolder = ""
 margin = 0
-
+imageFolder = ""
 
 # get data from config file
 try:
@@ -31,7 +31,8 @@ try:
         configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         outputFolder = configdata['extractedGlyphImageFolder']
         hocrSources = [configdata['hocrFolder'] + f for f in os.listdir(configdata['hocrFolder']) if re.search(r"hocr|html",f)]
-        imageSources = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder']) if re.search(r"png|jpg|tiff|PNG|JPEG|JPG|jpeg", f)]
+        imageSources = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder']) if re.search(r"png|jpg|tiff|tif|PNG|JPEG|JPG|jpeg|jp2", f)]
+        imageFolder = configdata['pagesImagesFolder']
         margin = configdata['hocrMarginPixel']
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
@@ -41,6 +42,7 @@ if args.output is not None:
     outputFolder = args.output
 if args.image is not None:
     imageSources = args.image
+    imageFolder = args.image
 if args.hocr is not None:
     hocrSources = args.hocr
 if args.margin is not None:
@@ -56,18 +58,35 @@ subprocess.call(["mkdir", "-p", outputFolder])
 globalGlyphCount = 0
 HOCRs = {}
 imgs = {}
-# check if the number of PAGE files and page image match.
-if len(hocrSources) == len(imageSources):
-    for f in hocrSources:
-        # get page number and match it with it HOCR file parsed in a dictionary : HOCRs[<page>] = <page>.hocr
-        pageHOCR = re.findall('\d+', f.split("/")[-1])[0]
-        with open(f, "rb") as fp:
-            HOCRs[pageHOCR] = BeautifulSoup(fp, "lxml")
 
+for f in hocrSources:
+    # get page number and match it with it HOCR file parsed in a dictionary : HOCRs[<page>] = <page>.hocr
+    pageHOCR = re.findall('\d+', f.split("/")[-1])[0]
+    with open(f, "rb") as fp:
+        HOCRs[pageHOCR] = BeautifulSoup(fp, "lxml")
+    ocr_page_result = HOCRs[pageHOCR].select(".ocr_page")
+    if len(ocr_page_result) == 1:
+        ocr_page = ocr_page_result[0]
+        page_image = extracthocr.getTitleAttribute(ocr_page, "image")
+        print(page_image)
+        page_image_path =  page_image
+        print(page_image_path)
+        if os.path.isfile(page_image_path):
+            print(page_image_path)
+            imgs[pageHOCR] = Image.open(page_image_path)
+            print(imgs[pageHOCR])
+print(imgs)
+
+if len(imgs) == 0:
+    print(":(")
     for i in imageSources:
         # get page number and match it with it .png file parsed by PIL in a dictionary : imgs[<page>] = <page>.png
         pageNum = re.findall('\d+', i)[0]
+        print(pageNum)
         imgs[pageNum] = Image.open(i)
+
+
+if len(HOCRs) == len(imgs):
 
     for pageNumber in sorted(HOCRs):  # page by page
         hocrDocument = HOCRs[pageNumber]
@@ -83,6 +102,12 @@ if len(hocrSources) == len(imageSources):
 
                 # unicodeChars = []
                 coordsCorpList = []
+                stylised_nodes = {}
+                for style in configdata["fontStyles"]:
+                    stylised_nodes[style[0]] = hocrDocument.select(style[0])
+
+                print(stylised_nodes)
+
                 for n in nodeGlyphs:  # glyph by glyph
 
                     area = extracthocr.zoning(imgPage, n, margin)
@@ -102,17 +127,28 @@ if len(hocrSources) == len(imageSources):
 
                     glyphName = n.get_text()
 
+                    #print(configdata["fontStyles"])
+                    fontFamily = extracthocr.getFontFamily(n, stylised_nodes, configdata["fontStyles"])
+                    print(fontFamily)
+
+                    if len(fontFamily) > 0:
+                        outputFolderFamily = outputFolder + "/" + fontFamily + "/"
+                        subprocess.call(["mkdir", "-p", outputFolder])
+
+                    else:
+                        outputFolderFamily = outputFolder
+
                     outputName = glyphName + "-" + str(int(confidenceValue)) + "-" + str(pageNumber) + "-" + str(word_id) + "-" + str(globalGlyphCount) + ".png"
                     if glyphName == ".":  # to fix "." name
-                        subprocess.call(["mkdir", "-p", outputFolder + ".point"])
+                        subprocess.call(["mkdir", "-p", outputFolderFamily + ".point"])
                         #subprocess.call(["mv", outputFolder + imgUnsorted, outputFolder + ".point/"])
-                        area.save(outputFolder + ".point/" + outputName)
+                        area.save(outputFolderFamily + ".point/" + outputName)
                     else:
-                        subprocess.call(["mkdir", "-p", outputFolder + glyphName])
+                        subprocess.call(["mkdir", "-p", outputFolderFamily + glyphName])
                         #subprocess.call(["mv", outputFolder + imgUnsorted, outputFolder + glyphName])
-                        area.save(outputFolder + glyphName + "/" + outputName)
-                        subprocess.call(["mkdir", "-p", outputFolder + glyphName +  "/Italic"])
-                        subprocess.call(["mkdir", "-p", outputFolder + glyphName +  "/Bold"])
+                        area.save(outputFolderFamily + glyphName + "/" + outputName)
+                        #subprocess.call(["mkdir", "-p", outputFolderFamily + glyphName +  "/Italic"])
+                        #subprocess.call(["mkdir", "-p", outputFolderFamily + glyphName +  "/Bold"])
 
                     #area.save(outputFolder + outputName)
                     globalGlyphCount += 1
@@ -122,4 +158,4 @@ if len(hocrSources) == len(imageSources):
             print("impossible to extract images from {}".format(pageNumber))
 
 else:
-    print("HOCR files ({}) and page images ({}) don't match".format(len(hocrSources),len(imageSources)))
+    print("HOCR files ({}) and page images ({}) don't match".format(len(HOCRs),len(imgs)))

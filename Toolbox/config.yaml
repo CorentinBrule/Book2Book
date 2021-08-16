@@ -13,6 +13,11 @@ capHeight: 0
 
 extractedGlyphImageFolder: Glyphes/auto-extracted/
 
+fontStyles:
+  - [i, italic]
+  - [.page_smallCaps, smallCaps]
+  - [e, bold]
+
 sortedGlyphImageFolder: Glyphes/auto-extracted/
 sortInSameFolder: 0
 

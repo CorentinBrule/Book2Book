@@ -44,7 +44,7 @@ if len(images2analysis) > 0:
     progressBar = ProgressBar(len(images2analysis), 30, "Analysis : ")
     for img in images2analysis:
 
-        if os.path.isfile(img) and re.search(r"\.png|\.PNG|\.jpg|\.jpeg|\.JPG|\.JPEG", img):
+        if os.path.isfile(img) and re.search(r"\.png|\.PNG|\.jpg|\.jpeg|\.JPG|\.JPEG|\.tif|\.TIF|\.jp2", img):
             outputName = img.split("/")[-1].split(".")[0:-1]
             subprocess.call(
                 ["tesseract", str(img), str(outputFolder) + str(outputName[0]), "-l", lang, "-c", "tessedit_create_hocr=1", "-c", "hocr_char_boxes=1"])
