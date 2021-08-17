@@ -16,6 +16,7 @@ args = parser.parse_args()
 images2analysis = ""
 outputFolder = ""
 lang = ""
+resolution = 300
 
 # get data from config file
 try:
@@ -23,7 +24,8 @@ try:
         configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         outputFolder = configdata['hocrFolder']
         images2analysis = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder'])]
-
+        resolution = configdata["pagesResolution"]
+        print(resolution)
         lang = configdata["ocrLanguage"]
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
@@ -47,7 +49,7 @@ if len(images2analysis) > 0:
         if os.path.isfile(img) and re.search(r"\.png|\.PNG|\.jpg|\.jpeg|\.JPG|\.JPEG|\.tif|\.TIF|\.jp2", img):
             outputName = img.split("/")[-1].split(".")[0:-1]
             subprocess.call(
-                ["tesseract", str(img), str(outputFolder) + str(outputName[0]), "-l", lang, "-c", "tessedit_create_hocr=1", "-c", "hocr_char_boxes=1"])
+                ["tesseract", str(img), str(outputFolder) + str(outputName[0]), "-l", lang, "--dpi", resolution ,"-c", "tessedit_create_hocr=1", "-c", "hocr_char_boxes=1"])
         else:
             print(" ----> invalid file found : {}".format(img))
         progressBar.update()
