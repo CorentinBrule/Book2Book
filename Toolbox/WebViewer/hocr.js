@@ -16,6 +16,7 @@ var selector = document.querySelector("#selectPage");
 var cbborders = document.getElementsByClassName("cbborders")
 var cbimages = document.getElementsByClassName("cbimages")
 
+var editable = false;
 // keyboard events
 
 document.addEventListener('keypress', (event) => {
@@ -195,10 +196,61 @@ function checkText(self) {
     divs[i].classList.add("text_level_focus");
     if (divs[i].className.indexOf("ocrx_cinfo") == -1 ){
         divs[i].setAttribute("text-content",divs[i].textContent);
-    }else{
     }
   }
 }
+
+function getText(el){
+  if(el.classList.contains("ocr_carea")){
+    return getTextFromArea(el);
+  }else if (el.classList.contains("ocr_par")) {
+    return getTextFromPara(el);
+  }else if (el.classList.contains("ocr_line")) {
+    return getTextFromLine(el);
+  }else if (el.classList.contains("ocrx_word")) {
+    return getTextFromWord(el);
+  }else{
+    return el.textContent;
+  }
+}
+
+function getTextFromArea(el){
+  let paraArray = [];
+  let paras = el.getElementsByClassName("ocr_par");
+  for (var i = 0; i < paras.length; i++) {
+    paraArray.push(getTextFromPara(paras[i]));
+  }
+  return paraArray.join("\n\n")
+}
+
+function getTextFromPara(el){
+  let lineArray = [];
+  let lines = el.getElementsByClassName("ocr_line");
+  for (var i = 0; i < lines.length; i++) {
+    lineArray.push(getTextFromLine(lines[i]));
+  }
+  return lineArray.join("\n");
+}
+
+function getTextFromLine(el){
+  let wordArray = [];
+  let words = el.getElementsByClassName("ocrx_word");
+  for (var i = 0; i < words.length; i++) {
+    let wordText = getTextFromWord(words[i])
+    wordArray.push(wordText);
+  }
+  return wordArray.join(" ");
+}
+
+function getTextFromWord(el){
+  let text = "";
+  let chars = el.getElementsByClassName("ocrx_cinfo");
+  for (var i = 0; i < chars.length; i++) {
+    text += chars[i].textContent;
+  }
+  return text;
+}
+
 /*
 (function checkFocus() {
     focus = document.querySelectorAll(".cbFocus");
@@ -225,6 +277,25 @@ function checkText(self) {
     }
 })();
 */
+
+function checkEdit(self){
+  console.log(self)
+  if (self.checked){
+    console.log("true");
+    editable = true;
+  }else{
+    console.log("false");
+    editable = false;
+  }
+}
+
+// edit text
+document.getElementById("textEditor").addEventListener("submit",function(ev){
+  ev.preventDefault();
+  editText();
+})
+
+
 zoomSlider.addEventListener('input', function(ev) {
     zoomValue = parseInt(ev.target.value);
     updateZoom();
@@ -248,8 +319,13 @@ fontSlider.addEventListener('input', function(ev) {
   // console.log();
 });
 
+function isHocrElement(el){
+  return(list_ocr_tag.some(className => el.classList.contains(className)));
+}
+
 function getTitleAttribute(hocr_element,attribute){
   title = hocr_element.getAttribute("title");
+  //console.log(title)
   if (attribute ==  'bbox' || attribute == "x_bboxes"){
     try{
       return title.match(/bbox\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/).slice(1).map(function(coord) {
@@ -262,7 +338,7 @@ function getTitleAttribute(hocr_element,attribute){
     }
   }
   else if (attribute == 'image') {
-    return title.match(/image\s+"([^"]+)"/)[1];
+    return title.match(/image\s+(?:'|")(.+)(?:'|")/)[1];
   }
   else if (attribute == null) {
     return title;
@@ -272,12 +348,16 @@ function getTitleAttribute(hocr_element,attribute){
 function placeHocrElement(element) {
   var coords = getTitleAttribute(element,"bbox");
   //console.log(element);
-  element.style.left = coords[0] + "px";
-  element.style.top = coords[1] + "px";
-  element.style.width = coords[2] - coords[0] + "px";
-  element.style.height = coords[3] - coords[1] + "px";
-  var page_coords = getTitleAttribute(document.querySelector('.ocr_page'),"bbox");
-  document.querySelector('body').style.minHeight = page_coords[2] + 'px';
+  bbox2css(element,coords)
+  /*var page_coords = getTitleAttribute(document.querySelector('.ocr_page'),"bbox");
+  document.querySelector('body').style.minHeight = page_coords[2] + 'px';*/
+}
+
+function bbox2css(element,coords){
+  element.style.left = String(coords[0]) + "px";
+  element.style.top = String(coords[1]) + "px";
+  element.style.width = String(coords[2] - coords[0]) + "px";
+  element.style.height = String(coords[3] - coords[1]) + "px";
 }
 
 // load hocr file

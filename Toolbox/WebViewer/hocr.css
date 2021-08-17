@@ -63,8 +63,13 @@ body{
     align-items: center;
     /* align vertical */
     line-height:-moz-block-height;
-
+    pointer-events: none;
 }
+
+.hocr-viewer .text_level_focus{
+  pointer-events: auto;
+}
+
 /*.hocr-viewer *[class^="ocr"]:hover::before {
       display: block;
       background: white;
@@ -167,6 +172,10 @@ body{
   right:0;
   color: black;
   font-size: inherit;
+}
+
+.selected{
+  outline: 3px solid black;
 }
 
 /*

@@ -36,6 +36,11 @@
     <h2>Font</h2>
     <input type='range' class='slide fontSize' min='0' max='100' step='1' value="10"/>
     <h2>Edition</h2>
+    <input id="cbEditable" type="checkbox" name="editable" checked="false" value="editable" onChange="checkEdit(this)">Editable<br>
+    <form id="textEditor" action="">
+      <input id="textInput" name⁼"textInput">
+      <input type="submit" value="edit text">
+    </form>
     <button onclick="saveEdition()">Save Edition</button>
   </menu>
   <body>
