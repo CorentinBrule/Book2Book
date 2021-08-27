@@ -50,6 +50,8 @@ try:
 except IOError:
     print("Metrics file 'metrics.json' or 'mult_to_cadratin' value not found !")
 
+outputFile = svgFile.split(".")[0] +".sfd"
+
 font = fontforge.font()
 # glypha = font.createMappedChar('a')
 
@@ -76,11 +78,12 @@ svglyphlayers = [g for g in svgDom.getElementsByTagName('g') if
 print(svglyphlayers[0].getAttribute("inkscape:label"))
 
 for layer in svglyphlayers:
-    name = layer.getAttribute("inkscape:label")
-    strglyph = re.findall(r'GlyphLayer-(.*)', name)[0].encode('utf-8')
-    print(name)
-    print(strglyph.decode('utf-8'))
-    print(layer.toxml("utf-8"))
+    print("-------------------")
+    layerName = layer.getAttribute("inkscape:label")
+    glyphName = layerName.split("-")[-1]
+    print(glyphName)
+    if glyphName == "autre" or glyphName == "":
+        continue
     print(layer.getAttribute("width")[0:-2])
     gwidth = float(layer.getAttribute("width")[0:-2])
 
@@ -104,8 +107,12 @@ for layer in svglyphlayers:
         print("non!")
         uniCodePoint = fontforge.unicodeFromName(strglyph)
     '''
-    uniCodePoint = codepoints.from_unicode(strglyph.decode('utf-8'))[0]
-    glyphName = fontforge.nameFromUnicode(uniCodePoint)
+
+    #if re.match(r"",strglyph):
+
+    #uniCodePoint = codepoints.from_unicode(strglyph.decode('utf-8'))[0]
+    uniCodePoint = fontforge.unicodeFromName(glyphName)
+    #glyphName = fontforge.nameFromUnicode(uniCodePoint)
     print(uniCodePoint)
     print(glyphName)
     #fontglyph = font.createMappedChar(glyphName)
@@ -133,4 +140,4 @@ space = font.createMappedChar(" ")
 # font.selection.all()
 # font.autoWidth(200)
 
-font.save(fontFile)
+font.save(outputFile)

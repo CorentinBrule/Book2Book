@@ -11,28 +11,6 @@ def margining(coord, w=0, h=0, W=0, H=0):
     coord[3] += H
     return coord
 
-def getFontFamily(hocr_glyph, stylised_nodes, fontStyles):
-    styles = []
-
-    for i, (cssSelector,fontStyle) in enumerate(fontStyles):
-        if hocr_glyph in stylised_nodes[cssSelector]:
-            styles.append(fontStyle) #glyph
-        elif hocr_glyph.parent in stylised_nodes[cssSelector]:
-            styles.append(fontStyle) #word
-        elif hocr_glyph.parent.parent in stylised_nodes[cssSelector]:
-            styles.append(fontStyle) #line
-        elif hocr_glyph.parent.parent.parent in stylised_nodes[cssSelector]:
-            styles.append(fontStyle) #paragraph
-        elif hocr_glyph.parent.parent.parent.parent in stylised_nodes[cssSelector]:
-            styles.append(fontStyle) #area
-
-    styles = list(dict.fromkeys(styles)) # remove doubles
-    styles.sort()
-    if len(styles)>0:
-        return "-".join(styles)
-    else :
-        return ""
-
 def getTitleAttribute(hocr_element, attribute):
     title = hocr_element["title"]
     if attribute == 'bbox' or attribute == 'x_bboxes':

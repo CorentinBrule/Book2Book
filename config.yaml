@@ -16,6 +16,15 @@ extractedGlyphImageFolder: Glyphs/auto-extracted/
 sortedGlyphImageFolder: Glyphs/auto-extracted/
 sortInSameFolder: 0
 
+fontStyles:
+  - italic
+  - smallCaps
+
+cssSelectors:
+  i: italic
+  em: italic
+  .page_smallCaps: smallCaps
+
 averageFolder: Glyphs/average/
 
 levelsFolder: Glyphs/levels/
@@ -23,7 +32,11 @@ levelValues:
   - 15
   - 30
   - 60
-deltaValue: 50
+  - 40
+deltaValues:
+  - 20
+blurValues:
+  - "0x8"
 
 resizedFolder: Glyphs/resized/
 

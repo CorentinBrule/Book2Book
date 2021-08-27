@@ -13,29 +13,37 @@ parser.add_argument("-m", "--metrics", help="metrics json file")
 parser.add_argument("-t", "--target", help="image(s) to be leveled.", nargs='+')
 parser.add_argument("-o", "--output", help="folder to save the leveled image(s)")
 parser.add_argument("-l", "--level", help="level value(s)", nargs='+')
-parser.add_argument("-d", "--delta", help="level delta value")
+parser.add_argument("-d", "--delta", help="level delta value", nargs="+")
+parser.add_argument("-b", "--blur", help="blur value(s)", nargs="+")
 parser.add_argument("-r", "--resize", help="mult for rescale images. If not filled, this script will try to find the 'mult_to_cadratin' value in 'matrics.json' file")
+parser.add_argument("-s", "--style", help="specify style(s) of the font familly", nargs="+")
+
 parser.add_argument("--tmp", help="folder to save resized images")
 args = parser.parse_args()
 
 metricsFile = ""
 metrics = {}
 images = ""
-outputFolder = ""
+levelFolder = ""
 levels = ""
-delta = ""
+deltas = []
 resize = 1
 resizedFolder = ""
+fontStyles = ["main"]
+blurs = []
 
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
         configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         metricsFile = configdata['metricsFile']
-        images = [configdata['averageFolder'] + i for i in os.listdir(configdata['averageFolder'])]
-        outputFolder = configdata['levelsFolder']
+        averageFolder = configdata['averageFolder']
+        levelFolder = configdata['levelsFolder']
         levels = configdata['levelValues']
-        delta = configdata['deltaValue']
+        deltas = [d for d in configdata['deltaValues']]
+        blurs = [b for b in configdata["blurValues"]]
         resizedFolder = configdata['resizedFolder']
+        for fontStyle in configdata['fontStyles']:
+            fontStyles.append(fontStyle[1])
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
 
@@ -54,48 +62,55 @@ if metrics is not None:
 if args.target is not None:
     images = args.target
 if args.output is not None:
-    outputFolder = args.output
+    levelFolder = args.output
 if args.level is not None:
     levels = args.level
 if args.delta is not None:
-    delta = args.delta
+    deltas = args.delta
 if args.resize is not None:
     resize = args.resize
 if args.tmp is not None:
     resizedFolder = args.temp
+if args.style is not None:
+    fontStyles = args.style
 
-subprocess.call(["mkdir", "-p", outputFolder])
+subprocess.call(["mkdir", "-p", levelFolder])
 subprocess.call(["mkdir", "-p", resizedFolder])
 
 percentResize = str(resize*100)+"%"
 
+for fontStyle in fontStyles:
+    styleFolder = averageFolder + "/" + fontStyle
+    images = [styleFolder+"/"+f for f in os.listdir(styleFolder)]
+    BarGlyph = ProgressBar(len(images), 30, "Glyphs : ")
+    outputFolder = levelFolder + "/" + fontStyle
+    subprocess.call(["mkdir", "-p", outputFolder])
 
+    for glyph in images:
+        glyphName = glyph.split("/")[-1].split(".")[-2]  # get the name of the glyph
+        # print(glyphName)
 
-BarGlyph = ProgressBar(len(images), 30, "Glyphs : ")
+        # save rescale and modify versions
+        if resize != 1:
+            subprocess.call(["convert", glyph, "-resize", percentResize, resizedFolder + glyphName + ".png"]) #save a rescale version
+            for blur in blurs:
+                for delta in deltas:
+                    for level in levels:
+                        m = int(level) - delta / 2
+                        M = int(level) + delta / 2
+                        parameter = str(m) + "%," + str(M) + "%"  # ex : 45%,55% with level=50% and delta=10%
+                        outputName = glyphName + "-" + str(level) + "pc" + str(delta) + "d" + "-" + blur + ".png"
+                        subprocess.call(
+                            ["convert", resizedFolder+glyphName+".png", "-blur", blur ,"-level", parameter, outputFolder + "/" + outputName])
 
-for glyph in images:
-    glyphName = glyph.split("/")[-1][0]  # get the name of the glyph
-    # print(glyphName)
+        else:
+            for level in levels:
+                m = int(level) - delta / 2
+                M = int(level) + delta / 2
+                parameter = str(m) + "%," + str(M) + "%"  # ex : 45%,55% with level=50% and delta=10%
+                outputName = glyphName + str(level) + "pc" + str(delta) + "d.png"
+                subprocess.call(["convert", glyph, "-level", parameter, outputFolder + "/" + outputName])
 
-    # save rescale and modify versions
-    if resize != 1:
-        subprocess.call(["convert", glyph, "-resize", percentResize, resizedFolder + glyphName + ".png"]) #save a rescale version
-        for level in levels:
-            m = int(level) - delta / 2
-            M = int(level) + delta / 2
-            parameter = str(m) + "%," + str(M) + "%"  # ex : 45%,55% with level=50% and delta=10%
-            outputName = glyphName + str(level) + "pc" + str(delta) + "d.png"
-            subprocess.call(
-                ["convert", resizedFolder+glyphName+".png", "-level", parameter, outputFolder + "/" + outputName])
+                #BarLvl.update()
 
-    else:
-        for level in levels:
-            m = int(level) - delta / 2
-            M = int(level) + delta / 2
-            parameter = str(m) + "%," + str(M) + "%"  # ex : 45%,55% with level=50% and delta=10%
-            outputName = glyphName + str(level) + "pc" + str(delta) + "d.png"
-            subprocess.call(["convert", glyph, "-level", parameter, outputFolder + "/" + outputName])
-
-            #BarLvl.update()
-
-    BarGlyph.update()
+        BarGlyph.update()

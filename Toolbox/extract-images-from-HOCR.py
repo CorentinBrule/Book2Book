@@ -15,8 +15,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--configfile", default="config.yaml")
 parser.add_argument("-H", "--hocr", help="HOCR source files", nargs='+')
 parser.add_argument("-i", "--image", help="images source files", nargs='+')
-parser.add_argument("-m", "--margin", help="margin around raw HOCR charboxes")
+parser.add_argument("-m", "--margin", help="margin around raw HOCR charboxes", type=int)
 parser.add_argument("-o", "--output", help="folder to save extracted images of glyphs")
+parser.add_argument("-s", "--style", help="specific style(s)", nargs='+')
+parser.add_argument("--mode", help="extraction mode : glyph by delfault")
+
 args = parser.parse_args()
 
 hocrSources = ""
@@ -24,16 +27,24 @@ imageSources = ""
 outputFolder = ""
 margin = 0
 imageFolder = ""
+fontStyles = ["main"]
+cssSelectors = []
+specificStyles = []
+mode = "glyph"
 
 # get data from config file
 try:
     with open(args.configfile, "r", encoding="utf8") as configfile:
         configdata = yaml.load(configfile, Loader=yaml.FullLoader)
         outputFolder = configdata['extractedGlyphImageFolder']
-        hocrSources = [configdata['hocrFolder'] + f for f in os.listdir(configdata['hocrFolder']) if re.search(r"hocr|html",f)]
-        imageSources = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder']) if re.search(r"png|jpg|tiff|tif|PNG|JPEG|JPG|jpeg|jp2", f)]
+        hocrSources = [configdata['hocrFolder'] + f for f in os.listdir(configdata['hocrFolder']) if
+                       re.search(r"hocr|html", f)]
+        imageSources = [configdata['pagesImagesFolder'] + f for f in os.listdir(configdata['pagesImagesFolder']) if
+                        re.search(r"png|jpg|tiff|tif|PNG|JPEG|JPG|jpeg|jp2", f)]
         imageFolder = configdata['pagesImagesFolder']
         margin = configdata['hocrMarginPixel']
+        fontStyles = configdata['fontStyles']
+        cssSelectors = configdata['cssSelectors']
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
 
@@ -47,17 +58,47 @@ if args.hocr is not None:
     hocrSources = args.hocr
 if args.margin is not None:
     margin = args.margin
+if args.style is not None:
+    specificStyles = args.style
+if args.mode is not None:
+    mode = args.mode
 
-#check name and create outputFolder
-if outputFolder[-1] != "/":
-    outputFolder += "/"
+
+def getFontFamily(hocr_glyph, stylised_nodes, fontStyles):
+    styles = []
+    for style in fontStyles:
+        if hocr_glyph in stylised_nodes[style]:
+            styles.append(style)  # glyph
+        elif hocr_glyph.parent in stylised_nodes[style]:
+            styles.append(style)  # word
+        elif hocr_glyph.parent.parent in stylised_nodes[style]:
+            styles.append(style)  # line
+        elif hocr_glyph.parent.parent.parent in stylised_nodes[style]:
+            styles.append(style)  # paragraph
+        elif hocr_glyph.parent.parent.parent.parent in stylised_nodes[style]:
+            styles.append(style)  # area
+
+    styles = list(dict.fromkeys(styles))  # remove doubles
+    styles.sort()
+    if len(styles) > 0:
+        return "-".join(styles)
+    else:
+        return "main"
+
+
+# check name and create outputFolder
 subprocess.call(["mkdir", "-p", outputFolder])
 
-#print(len(hocrSources),len(imageSources))
-#inputs sorted and matched
-globalGlyphCount = 0
+for style in fontStyles:
+    subprocess.call(["mkdir", "-p", outputFolder + "/" + style])
+
+# print(len(hocrSources),len(imageSources))
+# inputs sorted and matched
+globalAreaCounter = 0
 HOCRs = {}
 imgs = {}
+
+hocrSources.sort()
 
 for f in hocrSources:
     # get page number and match it with it HOCR file parsed in a dictionary : HOCRs[<page>] = <page>.hocr
@@ -69,7 +110,7 @@ for f in hocrSources:
         ocr_page = ocr_page_result[0]
         page_image = extracthocr.getTitleAttribute(ocr_page, "image")
         print(page_image)
-        page_image_path =  page_image
+        page_image_path = page_image
         print(page_image_path)
         if os.path.isfile(page_image_path):
             print(page_image_path)
@@ -85,6 +126,12 @@ if len(imgs) == 0:
         print(pageNum)
         imgs[pageNum] = Image.open(i)
 
+imageSources.sort()
+for f in hocrSources:
+    pageHOCR = re.findall('\d+', f.split("/")[-1])[0]
+    with open(f, "rb") as fp:
+        HOCRs[pageHOCR] = BeautifulSoup(fp, "lxml")
+    imgs[pageHOCR] = Image.open(imageSources[(int(pageHOCR) - 9)])
 
 if len(HOCRs) == len(imgs):
 
@@ -93,6 +140,7 @@ if len(HOCRs) == len(imgs):
         imgPage = imgs[pageNumber]
         firstPage = hocrDocument.find(attrs={"class": u"ocr_page"})
         # xml browsing
+
         if firstPage is not None:
             nodeGlyphs = firstPage.find_all(attrs={"class": u"ocrx_cinfo"})
 
@@ -100,62 +148,105 @@ if len(HOCRs) == len(imgs):
 
                 BarByPage = ProgressBar(len(nodeGlyphs), 30, 'Extraction page ' + pageNumber)
 
+                print(pageNumber)
+                print(type(pageNumber))
+
                 # unicodeChars = []
                 coordsCorpList = []
+                # find all element matched with cssSelector to find style of char
                 stylised_nodes = {}
-                for style in configdata["fontStyles"]:
-                    stylised_nodes[style[0]] = hocrDocument.select(style[0])
+                for selector in cssSelectors:
+                    stylised_nodes[cssSelectors[selector]] = []
+                for selector in cssSelectors:
+                    print(selector)
+                    print(cssSelectors[selector])
+                    stylised_nodes[cssSelectors[selector]] += hocrDocument.select(selector)
 
-                print(stylised_nodes)
+                if mode == "glyph":
 
-                for n in nodeGlyphs:  # glyph by glyph
+                    for n in nodeGlyphs:  # glyph by glyph
 
-                    area = extracthocr.zoning(imgPage, n, margin)
-                    confidenceValue = extracthocr.getTitleAttribute(n, "x_conf")
-                    word = n.parent
-                    try :
-                        if word.get("class").find("ocrx_word") == -1:
+                        confidenceValue = extracthocr.getTitleAttribute(n, "x_conf")
+                        word = n.parent
+                        try:
+                            if word.get("class").find("ocrx_word") == -1:
+                                word = word.parent
+                        except AttributeError:
                             word = word.parent
-                    except AttributeError:
-                        word = word.parent
 
-                    try :
-                        word_id = word.get('id')
-                    except:
-                        print(n)
-                        print(word)
+                        try:
+                            word_id = word.get('id')
+                        except:
+                            print(n)
+                            print(word)
 
-                    glyphName = n.get_text()
+                        glyphStr = n.get_text()
 
-                    #print(configdata["fontStyles"])
-                    fontFamily = extracthocr.getFontFamily(n, stylised_nodes, configdata["fontStyles"])
-                    print(fontFamily)
-
-                    if len(fontFamily) > 0:
+                        # print(configdata["fontStyles"])
+                        fontFamily = getFontFamily(n, stylised_nodes, fontStyles)
+                        print(fontFamily)
+                        if len(specificStyles) > 0 and not fontFamily in specificStyles:
+                            continue
                         outputFolderFamily = outputFolder + "/" + fontFamily + "/"
-                        subprocess.call(["mkdir", "-p", outputFolder])
+                        subprocess.call(["mkdir", "-p", outputFolderFamily])
 
-                    else:
-                        outputFolderFamily = outputFolder
+                        area = extracthocr.zoning(imgPage, n, margin)
 
-                    outputName = glyphName + "-" + str(int(confidenceValue)) + "-" + str(pageNumber) + "-" + str(word_id) + "-" + str(globalGlyphCount) + ".png"
-                    if glyphName == ".":  # to fix "." name
-                        subprocess.call(["mkdir", "-p", outputFolderFamily + ".point"])
-                        #subprocess.call(["mv", outputFolder + imgUnsorted, outputFolder + ".point/"])
-                        area.save(outputFolderFamily + ".point/" + outputName)
-                    else:
-                        subprocess.call(["mkdir", "-p", outputFolderFamily + glyphName])
-                        #subprocess.call(["mv", outputFolder + imgUnsorted, outputFolder + glyphName])
-                        area.save(outputFolderFamily + glyphName + "/" + outputName)
-                        #subprocess.call(["mkdir", "-p", outputFolderFamily + glyphName +  "/Italic"])
-                        #subprocess.call(["mkdir", "-p", outputFolderFamily + glyphName +  "/Bold"])
+                        outputName = glyphStr + "-" + str(int(confidenceValue)) + "-" + str(pageNumber) + "-" + str(word_id) + "-" + str(globalAreaCounter) + ".png"
+                        if glyphStr == ".":  # to fix "." name
+                            subprocess.call(["mkdir", "-p", outputFolderFamily + ".point"])
+                            area.save(outputFolderFamily + ".point/" + outputName)
+                        else:
+                            subprocess.call(["mkdir", "-p", outputFolderFamily + glyphStr])
+                            area.save(outputFolderFamily + "/" + glyphStr + "/" + outputName)
 
-                    #area.save(outputFolder + outputName)
-                    globalGlyphCount += 1
-                    BarByPage.update()
-                    #coordsCorpList.append(coordCrop)
+                        # area.save(outputFolder + outputName)
+                        globalAreaCounter += 1
+                        BarByPage.update()
+                        # coordsCorpList.append(coordCrop)
+                if mode == "word":
+                    words = firstPage.find_all(attrs={"class": u"ocrx_word"})
+
+                    for word in words:
+                        fontFamily = getFontFamily(word, stylised_nodes, fontStyles)
+                        if len(specificStyles) > 0 and not fontFamily in specificStyles:
+                            continue
+
+                        word_id = word.get('id')
+
+                        wordStr = word.findAll(text=True, recursive=False)
+
+                        if len(wordStr) > 0:
+                            wordStr = wordStr[0]
+
+                        outputFolderFamily = outputFolder + "/" + fontFamily + "/"
+                        subprocess.call(["mkdir", "-p", outputFolderFamily])
+
+                        outputName = wordStr + "-" + str(word_id) + "-" + str(globalAreaCounter)+ ".png"
+                        globalAreaCounter += 1
+
+                        area = extracthocr.zoning(imgPage, word, margin)
+                        area.save(outputFolderFamily + "/" + outputName)
+
         else:
             print("impossible to extract images from {}".format(pageNumber))
 
 else:
-    print("HOCR files ({}) and page images ({}) don't match".format(len(HOCRs),len(imgs)))
+    print("HOCR files ({}) and page images ({}) don't match".format(len(HOCRs), len(imgs)))
+
+if mode == "glyph":
+    for style in fontStyles:
+        stylePath = outputFolder + "/" + style + "/"
+        for glyphFolder in os.listdir(stylePath):
+            if os.path.isdir(stylePath + "/" + glyphFolder):
+                for otherStyle in fontStyles:
+                    if otherStyle != style:
+                        otherStyleFolder = outputFolder + "/" + otherStyle + "/"
+                        destinationLinkPath = os.path.abspath(stylePath + "/" + glyphFolder + "/" + otherStyleFolder)
+                        sourcePath = "../../" + otherStyle + "/" + glyphFolder
+                        print(sourcePath)
+                        print(destinationLinkPath)
+                        try:
+                            os.symlink(sourcePath, destinationLinkPath, target_is_directory=True)
+                        except FileNotFoundError:
+                            pass
