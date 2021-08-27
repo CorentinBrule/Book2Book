@@ -13,35 +13,34 @@ copyfile("Toolbox/test/99.jpg","Pages/99.jpg")
 
 # pillow show image page
 print("\n")
-subprocess.call(["Toolbox/venv3/bin/python3","Toolbox/olr-analysis.py","-c","Toolbox/test/config_test.yaml"])               # p
+subprocess.call(["Toolbox/venv/bin/python3","Toolbox/olr-analysis.py","-c","Toolbox/test/config_test.yaml"])               # p
 # tester la conformiter du document HOCR (avec python-hocr ?)
 # subprocess.call(["python","Toolbox/test/test-hocr-edit.py"])                                             # m
 # corriger le fichier HOCR avec une trancscription text fournie pour le test ?
 print("\n")
-subprocess.call(["Toolbox/venv3/bin/python3","Toolbox/extract-images-from-HOCR.py","-c","Toolbox/test/config_test.yaml"])   # p
+subprocess.call(["Toolbox/venv/bin/python3","Toolbox/extract-images-from-HOCR.py","-c","Toolbox/test/config_test.yaml"])   # p
 #
 # subprocess.call(["python","Toolbox/test/test-sort-glyphs.py"])                                           # m
 #
 # subprocess.call(["python","Toolbox/sort-images-of-char.py","-c","Toolbox/test/config_test.yaml"])        # s
 #
 print("\n")
-subprocess.call(["Toolbox/venv3/bin/python3","Toolbox/extract-metrics.py","-c","Toolbox/test/config_test.yaml"])            # p
+# subprocess.call(["Toolbox/venv/bin/python3","Toolbox/extract-metrics.py","-c","Toolbox/test/config_test.yaml"])            # p
 #
 print("\n")
-subprocess.call(["Toolbox/venv3/bin/python3","Toolbox/average.py","-c","Toolbox/test/config_test.yaml"])                    # p
+subprocess.call(["Toolbox/venv/bin/python3","Toolbox/average.py","-c","Toolbox/test/config_test.yaml"])                    # p
 #
 print("\n")
-subprocess.call(["Toolbox/venv3/bin/python3","Toolbox/level.py","-c","Toolbox/test/config_test.yaml"])                      # p
+subprocess.call(["Toolbox/venv/bin/python3","Toolbox/level.py","-c","Toolbox/test/config_test.yaml"])                      # p
 #
 print("\n")
-subprocess.call(["Toolbox/venv3/bin/python3","Toolbox/vectorize.py","-c","Toolbox/test/config_test.yaml"])                  # p
+subprocess.call(["Toolbox/venv/bin/python3","Toolbox/vectorize.py","-c","Toolbox/test/config_test.yaml"])                  # p
 #
 print("\n")
-subprocess.call(["Toolbox/venv3/bin/python3","Toolbox/importSVGinSVGFont.py","-c","Toolbox/test/config_test.yaml"])         # p
-#
-# # change environement
-print("\n")
-subprocess.call(["python2","Toolbox/svgfont2fontforge.py","-c","Toolbox/test/config_test.yaml"])         # p
+subprocess.call(["Toolbox/venv/bin/python3","Toolbox/importSVGinSVGFont.py","-c","Toolbox/test/config_test.yaml"])         # p
 #
 print("\n")
-subprocess.call(["python2","Toolbox/applymetrics.py","-c","Toolbox/test/config_test.yaml"])              # p
+subprocess.call(["Toolbox/venv/bin/python3","Toolbox/svgfont2fontforge.py","-c","Toolbox/test/config_test.yaml"])         # p
+#
+print("\n")
+# subprocess.call(["python2","Toolbox/applymetrics.py","-c","Toolbox/test/config_test.yaml"])              # p

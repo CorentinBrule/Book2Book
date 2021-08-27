@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 import fontforge
@@ -122,7 +122,8 @@ for layer in svglyphlayers:
     tmpsvg.getElementsByTagName("svg")[0].appendChild(layer)
     pathtmpsvg = individualGlyphFolder + glyphName + ".svg"
     with open(pathtmpsvg, 'w') as f:
-        f.write(tmpsvg.toxml("utf-8"))
+        print(type(tmpsvg))
+        tmpsvg.writexml(f)
 
     fontglyph.importOutlines(pathtmpsvg)
 
