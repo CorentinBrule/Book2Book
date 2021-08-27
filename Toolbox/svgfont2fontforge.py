@@ -20,6 +20,7 @@ svgFile = ""
 fontFile = ""
 individualGlyphFolder = ""
 metricsFile = ""
+ligatures = {}
 
 marginValue = 0
 try:
@@ -30,6 +31,7 @@ try:
         individualGlyphFolder = configdata['individualGlyphFolder']
         metricsFile = configdata['metricsFile']
         marginValue = configdata['hocrMarginPixel']
+        ligatures = configdata["ligatures"]
 except IOError:
     print("Config file 'config.yaml' not found or invalid !")
 
@@ -55,6 +57,9 @@ outputFile = svgFile.split(".")[0] +".sfd"
 font = fontforge.font()
 # glypha = font.createMappedChar('a')
 
+if len(ligatures) > 0:
+    font.addLookup("Substitution de ligature dans Latin lookup 0","gsub_ligature",(),(("liga",(("latn",("dflt")),)),))
+    font.addLookupSubtable("Substitution de ligature dans Latin lookup 0","Substitution de ligature dans Latin lookup 0-1")
 svgDom = minidom.parse(svgFile)
 svgModel = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
@@ -132,6 +137,10 @@ for layer in svglyphlayers:
     # correct the margin present since the extraction of the images.
     fontglyph.left_side_bearing = fontglyph.left_side_bearing-marginRescaledValue
     fontglyph.right_side_bearing = fontglyph.right_side_bearing-marginRescaledValue
+
+    if glyphName in ligatures:
+        ligature_components = tuple(ligatures[glyphName])
+        fontglyph.addPosSub("Substitution de ligature dans Latin lookup 0-1", ligature_components)
 
     #except ValueError as e:
     #    print("glyph name error")

@@ -38,6 +38,11 @@ deltaValues:
 blurValues:
   - "0x8"
 
+ligatures:
+  f_f: [f, f]
+  f_i: [f, i]
+  f_l: [f, l]
+
 resizedFolder: Glyphs/resized/
 
 pnmFolder: Glyphs/clean/
