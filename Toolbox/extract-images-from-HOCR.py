@@ -90,10 +90,12 @@ def getFontFamily(hocr_glyph, stylised_nodes, fontStyles):
 
 
 # check name and create outputFolder
-subprocess.call(["mkdir", "-p", outputFolder])
+if not os.path.isdir(outputFolder):
+    os.mkdir(outputFolder)
 
 for style in fontStyles:
-    subprocess.call(["mkdir", "-p", outputFolder + "/" + style])
+    if not os.path.isdir(outputFolder + "/" + style):
+        os.mkdir(outputFolder + "/" + style)
 
 # print(len(hocrSources),len(imageSources))
 # inputs sorted and matched
@@ -193,16 +195,19 @@ if len(HOCRs) == len(imgs):
                         if len(specificStyles) > 0 and not fontFamily in specificStyles:
                             continue
                         outputFolderFamily = outputFolder + "/" + fontFamily + "/"
-                        subprocess.call(["mkdir", "-p", outputFolderFamily])
+                        if not os.path.isdir(outputFolderFamily):
+                            os.mkdir(outputFolderFamily)
 
                         area = extracthocr.zoning(imgPage, n, margin)
 
                         outputName = glyphStr + "-" + str(int(confidenceValue)) + "-" + str(pageNumber) + "-" + str(word_id) + "-" + str(globalAreaCounter) + ".png"
                         if glyphStr == ".":  # to fix "." name
-                            subprocess.call(["mkdir", "-p", outputFolderFamily + ".point"])
+                            if not os.path.isdir(outputFolderFamily + ".point"):
+                                os.mkdir(outputFolderFamily + ".point")
                             area.save(outputFolderFamily + ".point/" + outputName)
                         else:
-                            subprocess.call(["mkdir", "-p", outputFolderFamily + glyphStr])
+                            if not os.path.isdir(outputFolderFamily + glyphStr):
+                                os.mkdir(outputFolderFamily + glyphStr)
                             area.save(outputFolderFamily + "/" + glyphStr + "/" + outputName)
 
                         # area.save(outputFolder + outputName)
@@ -225,7 +230,8 @@ if len(HOCRs) == len(imgs):
                             wordStr = wordStr[0]
 
                         outputFolderFamily = outputFolder + "/" + fontFamily + "/"
-                        subprocess.call(["mkdir", "-p", outputFolderFamily])
+                        if not os.path.isdir(outputFolderFamily):
+                            os.mkdir(outputFolderFamily)
 
                         outputName = wordStr + "-" + str(word_id) + "-" + str(globalAreaCounter)+ ".png"
                         globalAreaCounter += 1

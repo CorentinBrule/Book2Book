@@ -84,7 +84,8 @@ for fontStyle in fontStyles:
     images = [styleFolder+"/"+f for f in os.listdir(styleFolder)]
     BarGlyph = ProgressBar(len(images), 30, "Glyphs : ")
     outputFolder = levelFolder + "/" + fontStyle
-    subprocess.call(["mkdir", "-p", outputFolder])
+    if not os.path.isdir(outputFolder):
+        os.mkdir(outputFolder)
 
     for glyph in images:
         glyphName = glyph.split("/")[-1].split(".")[-2]  # get the name of the glyph

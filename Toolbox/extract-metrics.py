@@ -159,7 +159,8 @@ def get_all_metrics(HOCRs):
                                             j) + ".png"
                                         output_path = outputPairFolder + "/" + pair_name + "/"
                                         try:
-                                            subprocess.call(["mkdir", "-p", output_path])
+                                            if not os.path.isdir(output_path):
+                                                os.mkdir(output_path)
                                             area.save(output_path + output_name)
                                         except:
                                             print(
