@@ -49,7 +49,7 @@ if len(images2analysis) > 0:
         if os.path.isfile(img) and re.search(r"\.png|\.PNG|\.jpg|\.jpeg|\.JPG|\.JPEG|\.tif|\.TIF|\.jp2", img):
             outputName = img.split("/")[-1].split(".")[0:-1]
             subprocess.call(
-                ["tesseract", str(img), str(outputFolder) + str(outputName[0]), "-l", lang, "--dpi", resolution ,"-c", "tessedit_create_hocr=1", "-c", "hocr_char_boxes=1"])
+                ["tesseract", str(img), str(outputFolder) + str(outputName[0]), "-l", lang, "--dpi", str(resolution) ,"-c", "tessedit_create_hocr=1", "-c", "hocr_char_boxes=1"])
         else:
             print(" ----> invalid file found : {}".format(img))
         progressBar.update()

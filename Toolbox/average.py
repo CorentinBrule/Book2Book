@@ -15,10 +15,12 @@ parser.add_argument("-c", "--configfile", default="config.yaml")
 parser.add_argument("-t", "--targetfolder", help="folder(s) containing images to be averaged.", nargs='+')
 parser.add_argument("-o", "--output", help="folder to save the averaged image(s)")
 parser.add_argument("-s", "--style", help="specify style(s) of the font familly", nargs="+")
+parser.add_argument("-g", "--glyph", help="specify glyph")
 args = parser.parse_args()
 
 targetFolders = ""
 outputFolder = ""
+specified_glyph=""
 fontStyles = ["main"]
 # add "basic" font style, like "labor"
 
@@ -39,6 +41,8 @@ if args.output is not None:
     outputFolder = args.output
 if args.style is not None:
     fontStyles = args.style
+if args.glyph is not None:
+    specified_glyph = args.glyph
 
 #outputFolder += "/" + styleFolder
 
@@ -74,8 +78,14 @@ for fontStyle in fontStyles:
     if os.path.isdir(styleFolder):
         if not os.path.exists(outputFolder + "/" + fontStyle):
             os.mkdir(outputFolder + "/" + fontStyle)
-
-        glyphsFolders = [styleFolder + "/" + f for f in os.listdir(styleFolder) if os.path.isdir(styleFolder +"/"+ f)]
+        if len(specified_glyph) > 0:
+            glyphsFolders = [styleFolder + "/" + specified_glyph]
+            print(glyphsFolders)
+            if not os.path.exists(glyphsFolders[0]):
+                print("specified glyph doesn't exist")
+                exit()
+        else :
+            glyphsFolders = [styleFolder + "/" + f for f in os.listdir(styleFolder) if os.path.isdir(styleFolder +"/"+ f)]
         bar = ProgressBar(len(glyphsFolders), 30, "Averaging :")
         for f in glyphsFolders:
             images = list_all_fullpath_images(f)

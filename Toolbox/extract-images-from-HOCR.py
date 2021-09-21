@@ -18,7 +18,7 @@ parser.add_argument("-i", "--image", help="images source files", nargs='+')
 parser.add_argument("-m", "--margin", help="margin around raw HOCR charboxes", type=int)
 parser.add_argument("-o", "--output", help="folder to save extracted images of glyphs")
 parser.add_argument("-s", "--style", help="specific style(s)", nargs='+')
-parser.add_argument("--mode", help="extraction mode : glyph by delfault")
+parser.add_argument("--mode", help="extraction mode : glyph by default")
 
 args = parser.parse_args()
 
@@ -63,23 +63,26 @@ if args.style is not None:
 if args.mode is not None:
     mode = args.mode
 
-
+# les styles s'ajoute des glyphs aux paragraphes
 def getFontFamily(hocr_glyph, stylised_nodes, fontStyles):
     styles = []
     for style in fontStyles:
-        if hocr_glyph in stylised_nodes[style]:
-            styles.append(style)  # glyph
-        elif hocr_glyph.parent in stylised_nodes[style]:
-            styles.append(style)  # word
-        elif hocr_glyph.parent.parent in stylised_nodes[style]:
-            styles.append(style)  # line
-        elif hocr_glyph.parent.parent.parent in stylised_nodes[style]:
-            styles.append(style)  # paragraph
-        elif hocr_glyph.parent.parent.parent.parent in stylised_nodes[style]:
-            styles.append(style)  # area
+
+        family_nodes = stylised_nodes.get(style)
+        if family_nodes is not None:
+            if hocr_glyph in family_nodes:
+                styles.append(style)  # glyph
+            if hocr_glyph.parent in family_nodes:
+                styles.append(style)  # word
+            if hocr_glyph.parent.parent in family_nodes:
+                styles.append(style)  # line
+            if hocr_glyph.parent.parent.parent in family_nodes:
+                styles.append(style)  # paragraph
+            if hocr_glyph.parent.parent.parent.parent in family_nodes:
+                styles.append(style)  # area
 
     styles = list(dict.fromkeys(styles))  # remove doubles
-    styles.sort()
+    styles.reverse()
     if len(styles) > 0:
         return "-".join(styles)
     else:
@@ -116,6 +119,8 @@ for f in hocrSources:
             print(page_image_path)
             imgs[pageHOCR] = Image.open(page_image_path)
             print(imgs[pageHOCR])
+        else:
+            imgs[pageHOCR] = Image.open(imageFolder + page_image_path)
 print(imgs)
 
 if len(imgs) == 0:
@@ -127,11 +132,11 @@ if len(imgs) == 0:
         imgs[pageNum] = Image.open(i)
 
 imageSources.sort()
-for f in hocrSources:
-    pageHOCR = re.findall('\d+', f.split("/")[-1])[0]
-    with open(f, "rb") as fp:
-        HOCRs[pageHOCR] = BeautifulSoup(fp, "lxml")
-    imgs[pageHOCR] = Image.open(imageSources[(int(pageHOCR) - 9)])
+# for f in hocrSources:
+#     pageHOCR = re.findall('\d+', f.split("/")[-1])[0]
+#     with open(f, "rb") as fp:
+#         HOCRs[pageHOCR] = BeautifulSoup(fp, "lxml")
+#     imgs[pageHOCR] = Image.open(imageSources[(int(pageHOCR) - 9)])
 
 if len(HOCRs) == len(imgs):
 
