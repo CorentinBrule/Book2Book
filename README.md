@@ -109,6 +109,4 @@ Parameter Extraction from Historical Documents](Re-Typograph.jpg)
 
 Cette démarche est complémentaire aux deux autres. Le traitement formels est basique et ignore les spécificités technique et historique des spécimens, proposant une arpoche plus photographique que typographique. Toutes les caractéristiques du fac-similé sont intégrées dans la création des nouvelles formes (les défaut d'impression, de conservation, de numérisation), ne cherchant pas à créer un *idéal numérique* d'un document historique mais un outil de *re-production numérique*.
 
-La démarche d'ouverture de ce projet est surtout une tentative de ré-intégration des outils mathématiques et scientifiques dans une pratique de création de forme.
-
 [HOCR]: <https://en.wikipedia.org/wiki/HOCR>
